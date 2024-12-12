@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>smsc_logo.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="artifacts\**" />
+    <EmbeddedResource Remove="artifacts\**" />
+    <None Remove="artifacts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="smsc_logo.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Primitives" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.Primitives" />
+    <Using Include="SMSC.Exceptions" />
+    <Using Include="SMSC.Exceptions.HttpSms" />
+    <Using Include="SMSC.Exceptions.HttpSmsStatus" />
+    <Using Include="SMSC.Responses" />
+    <Using Include="SMSC.Responses.Converters" />
+    <Using Include="SMSC.Types" />
+    <Using Include="SMSC.Types.Enums" />
+    <Using Include="SMSC.Types.Groups" />
+    <Using Include="System.Globalization" />
+    <Using Include="System.Net" />
+    <Using Include="System.Net.Http.Json" />
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
+    <Using Include="System.Text.RegularExpressions" />
+  </ItemGroup>
+
+</Project>

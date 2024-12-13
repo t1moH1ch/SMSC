@@ -143,3 +143,18 @@ The result is returned as a class object `HttpSmsBalanceResponse`.
 ## Documentation
 
 This README aims to give a quick start guide - including enough to get you to quickly start sending SMS. For deeper detail of all properties go to [API Documentation](https://smsc.ru/api/#menu), and many other aspects of [smsc.ru](https://smsc.ru).
+
+## Implemented features
+- Http sms send manager ([documentation](https://smsc.ru/api/http/send/#menu))
+- Http sms status manager ([documentation](https://smsc.ru/api/http/status_messages/#menu))
+- Http balance manager ([documentation](https://smsc.ru/api/http/balance/#menu))
+
+In the future, we plan to implement:
+- Http mailing manager ([documentation](https://smsc.ru/api/http/jobs/#menu))
+- Http contact manager ([documentation](https://smsc.ru/api/http/contact/#menu))
+- Http client manager ([documentation](https://smsc.ru/api/http/users/#menu))
+- Http sender names manager ([documentation](https://smsc.ru/api/http/senders/#menu))
+- Http data (history) manager ([documentation](https://smsc.ru/api/http/get_data/#menu)) 
+- Connecting dedicated numbers to receive messages ([documentation](https://smsc.ru/api/http/miscellaneous/receive/#menu))
+- Confirming a phone number with a call ([documentation](https://smsc.ru/api/http/miscellaneous/waitcall/#menu))
+- Actions with deferred tasks ([documentation](https://smsc.ru/api/http/miscellaneous/downloads/#menu))

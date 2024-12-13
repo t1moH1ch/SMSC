@@ -15,13 +15,13 @@
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <BaseOutputPath>$(SolutionDir)\artifacts\Debug\</BaseOutputPath>
-    <OutDir>$(SolutionDir)\artifacts\Debug\</OutDir>
+    <BaseOutputPath>$(SolutionDir)\artifacts</BaseOutputPath>
+    <OutDir>$(SolutionDir)\artifacts</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
-    <BaseOutputPath>./artifacts/Release/</BaseOutputPath>
-    <OutDir>./artifacts/Release/</OutDir>
+    <BaseOutputPath>$(SolutionDir)\artifacts</BaseOutputPath>
+    <OutDir>$(SolutionDir)\artifacts\Release</OutDir>
   </PropertyGroup>
 </Project>

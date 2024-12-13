@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace SMSC;
+﻿namespace SMSC;
 
 public static class HttpSmsResponseExtensions
 {

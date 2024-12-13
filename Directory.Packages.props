@@ -4,7 +4,6 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Extensions.Primitives" Version="9.0.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.SDK" Version="17.12.0" />

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSC", "src\SMSC\SMSC.csproj", "{30D3EDE8-2BC8-4E32-8A68-573ED44B38CA}"
 EndProject
@@ -15,6 +15,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{15365809-DED4-4B49-B107-F6CB3F258CE6}"
+	ProjectSection(SolutionItems) = preProject
+		images\smsc_logo.png = images\smsc_logo.png
 	EndProjectSection
 EndProject
 Global
@@ -38,5 +45,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{30D3EDE8-2BC8-4E32-8A68-573ED44B38CA} = {72AF494D-668D-4EE3-847D-5BEDDB5AEE50}
 		{0C78E56F-50A8-4494-BE11-83136B93CEE9} = {CCEA1E4E-C149-4A1E-8D3B-D331610EAE0C}
+		{15365809-DED4-4B49-B107-F6CB3F258CE6} = {40B724C5-15D6-4778-9F50-39A9006FA84F}
 	EndGlobalSection
 EndGlobal

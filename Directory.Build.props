@@ -11,6 +11,7 @@
     <Utf8Output>true</Utf8Output>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DebugType>full</DebugType>

@@ -1,4 +1,4 @@
-# [<img align="center" src="https://smsc.ru/im/new/smsc_logo.png" width="150" alt="The SMSC logo" />](https://smsc.ru/)&nbsp;&nbsp;&nbsp;SMSC
+# [![SMSC](https://gitlab.com/t1moHa/SMSC/raw/master/images/smsc_logo.png)](https://smsc.ru)
 
 SMSC is an unofficial client .NET for the service [smsc.ru](https://smsc.ru) that allows developers to use HTTP-based API for sending and receiving phone calls and text messages.
 
@@ -17,7 +17,7 @@ or for Visual Studio package manager:
 ```sh
 Install-Package SMSC
 ```
-
+\
 You need to inititate a new instance of `ProviderConfiguration` with credentials:
 
 ```csharp
@@ -35,7 +35,7 @@ Create request manager from `HttpSms` class:
 ```csharp
 var httpSmsSender = new HttpSms(providerConfig);
 ```
-
+\
 Next, you need to create a configuration class object of `SmsConfiguration` with properties you need:
 
 ```csharp
@@ -60,7 +60,6 @@ var result = await httpSmsSender.SendSms("+79999999999", "123456", smsConfig);
 That is all you need to send a message to the client. The result is returned as a class object `HttpSmsResponse`.
 
 #
-
 ### Get status
 
 To check the SMS or e-mail delivery status, you must initiate `ProviderConfiguration`:
@@ -80,7 +79,7 @@ Create request manager from `HttpSmsStatus` class:
 ```csharp
 var httpSmsStatus = new HttpSmsStatus(providerConfig);
 ```
-
+\
 Next, you need to create a configuration class object of `SmsStatusConfiguration` with properties you need:
 
 ```csharp
@@ -105,11 +104,9 @@ var smsStatusConfig = new SmsStatusConfiguration()
 ```csharp
 var statusResult = await httpSmsStatus.CheckSms("+79999999999", smsStatusConfig);
 ```
-
 The result is returned as a class object `HttpSmsStatusResponse`.
 
 #
-
 ### Get balance
 
 To get a balance you need to inititate a new instance of `ProviderConfiguration` with credentials:
@@ -129,7 +126,7 @@ Create request manager from `HttpSmsBalance` class:
 ```csharp
 var httpSmsBalance = new HttpSmsBalance(providerConfig);
 ```
-
+\
 Next, you need to create a configuration class object of `SmsBalanceConfiguration` with properties you need:
 
 ```csharp

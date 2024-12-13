@@ -1,4 +1,4 @@
-# [<img align="center" src="https://smsc.ru/im/new/smsc_logo.png" width="150" alt="The SMSC logo" />](https://smsc.ru/)&nbsp;&nbsp;&nbsp;SMSC
+# ![SMSC logo](/images/smsc_logo.png)&nbsp;&nbsp;&nbsp;SMSC
 
 SMSC is an unofficial client .NET for the service [smsc.ru](https://smsc.ru) that allows developers to use HTTP-based API for sending and receiving phone calls and text messages.
 

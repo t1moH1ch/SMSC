@@ -5,9 +5,6 @@ public class ProviderConfiguration
     private readonly Uri _smscApiAddress = new("https://smsc.ru/sys/");
     private readonly Uri _jsonSmsApiAddress = new("https://smsc.ru/rest/send/");
 
-    public const string SmtpFrom = "api@smsc.ru";
-    public const string SmtpServer = "send.smsc.ru";
-
     /// <summary>
     /// Статический адрес API сервиса <seealso href="https://www.smsc.ru/">SMSC.ru</seealso>
     /// </summary>

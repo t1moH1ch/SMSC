@@ -229,7 +229,7 @@ public class HttpSmsStatusTest
 
         var smsConfig = new SmsConfiguration();
 
-        var res = await _httpSmsSender.SendSms(phone, new StringValues($"Test SMS from {GetType().Name}"), smsConfig);
+        var res = await _httpSmsSender.SendSms(client: phone, new StringValues($"Test SMS from {GetType().Name}"), smsConfig);
         return res?.Id;
     }
     private async Task<string?> CreateHLRItemAsyncTest(StringValues phone)
@@ -241,7 +241,7 @@ public class HttpSmsStatusTest
             SmsType = SmsType.HLR
         };
 
-        var res = await _httpSmsSender.SendSms(phone, new StringValues($"Test SMS from {GetType().Name}"), smsConfig);
+        var res = await _httpSmsSender.SendSms(client: phone, new StringValues($"Test SMS from {GetType().Name}"), smsConfig);
         return res?.Id;
     }
 }

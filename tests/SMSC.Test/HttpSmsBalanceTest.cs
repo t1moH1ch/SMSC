@@ -8,7 +8,6 @@ namespace SMSC.Test;
 
 public class HttpSmsBalanceTest
 {
-    private readonly StringValues PhoneForTest;
     private readonly string ApiKey;
     private readonly string Login;
     private readonly string Password;
@@ -22,7 +21,6 @@ public class HttpSmsBalanceTest
             .AddUserSecrets(GetType().Assembly)
             .Build();
 
-        PhoneForTest = new StringValues(config["Phone"]!);
         ApiKey = config["ApiKey"]!;
         Login = config["Login"]!;
         Password = config["Password"]!;

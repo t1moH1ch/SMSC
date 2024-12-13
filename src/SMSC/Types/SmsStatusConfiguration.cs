@@ -9,7 +9,7 @@ public class SmsStatusConfiguration : IConfiguration
     /// Идентификатор представляет собой 32-битное число в диапазоне от 1 до 2147483647, 
     /// либо строку длиной до 40 символов, состоящую из латинских букв, цифр и символов ".-_"
     /// </summary>
-    public string? Id { get; set; }
+    public required string? Id { get; set; }
     /// <summary>
     /// Формат ответа сервера об успешной отправке.<br/>
     /// По умолчанию <see cref="ResponseFormat.Default"/>

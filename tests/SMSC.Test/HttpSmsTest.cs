@@ -12,8 +12,8 @@ namespace SMSC.Test;
 
 public class HttpSmsTest
 {
-    private readonly StringValues Phone1;
-    private readonly StringValues Phone2;
+    private readonly string? Phone1;
+    private readonly string? Phone2;
     private readonly string ApiKey;
     private readonly string Login;
     private readonly string Password;
@@ -24,8 +24,8 @@ public class HttpSmsTest
             .AddUserSecrets(GetType().Assembly)
             .Build();
 
-        Phone1 = new StringValues(config["Phone"]!);
-        Phone2 = new StringValues(config["Phone2"]!);
+        Phone1 = config["Phone"];
+        Phone2 = config["Phone2"];
         ApiKey = config["ApiKey"]!;
         Login = config["Login"]!;
         Password = config["Password"]!;

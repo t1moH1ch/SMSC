@@ -28,9 +28,9 @@ public class HttpSms(
 	/// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
 	/// предназначенные для просмотра отправителем истории в личном кабинете.</param>
 	/// <exception cref="MessageMaxLengthException"/>
-	public virtual async Task<HttpSmsResponse> SendSms(string client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+	public virtual async Task<HttpSmsResponse> SendSms(string? client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
-		ArgumentException.ThrowIfNullOrEmpty(nameof(client), client);
+		ArgumentException.ThrowIfNullOrEmpty(client, nameof(client));
 
 		SmsConfiguration = config;
 		return await (await SendRequest(CreateRequest((@params) =>
@@ -61,14 +61,14 @@ public class HttpSms(
 	/// предназначенные для просмотра отправителем истории в личном кабинете.</param>
 	/// <exception cref="MessageMaxLengthException"/>
 	/// <exception cref="ArgumentOutOfRangeException"/>
-	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<string> clients, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<string?> clients, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		if (!clients.Any())
 			throw new ArgumentOutOfRangeException(nameof(clients), "Clients can`t be empty. Try fill it.");
 
 		SmsConfiguration = config;
 
-		var phones = string.Join(PhonesDelimeter, clients.Select(c => c.ToString()));
+		var phones = string.Join(PhonesDelimeter, clients.Where(c => !string.IsNullOrEmpty(c)).Select(c => c!.ToString()));
 		return await (await SendRequest(CreateRequest((@params) =>
 		{
 			@params.Add("phones", phones);
@@ -137,7 +137,7 @@ public class HttpSms(
 	/// предназначенные для просмотра отправителем истории в личном кабинете.</param>
 	/// <exception cref="MessageMaxLengthException"/>
 	/// <exception cref="InvalidOperationException"/>
-	public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string message, SmsConfiguration config, CancellationToken cancellationToken = default)
+	public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(groupId, nameof(groupId));
 

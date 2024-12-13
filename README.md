@@ -59,6 +59,8 @@ var result = await httpSmsSender.SendSms("+79999999999", "123456", smsConfig);
 
 That is all you need to send a message to the client. The result is returned as a class object `HttpSmsResponse`.
 
+#
+
 ### Get status
 
 To check the SMS or e-mail delivery status, you must initiate `ProviderConfiguration`:
@@ -105,6 +107,8 @@ var statusResult = await httpSmsStatus.CheckSms("+79999999999", smsStatusConfig)
 ```
 
 The result is returned as a class object `HttpSmsStatusResponse`.
+
+#
 
 ### Get balance
 

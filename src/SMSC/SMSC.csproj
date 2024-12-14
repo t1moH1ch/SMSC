@@ -28,10 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="smsc_logo.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="..\..\images\smsc_logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

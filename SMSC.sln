@@ -17,12 +17,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
-		src\SMSC\smsc_logo.ico = src\SMSC\smsc_logo.ico
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{15365809-DED4-4B49-B107-F6CB3F258CE6}"
 	ProjectSection(SolutionItems) = preProject
 		images\smsc_logo.ico = images\smsc_logo.ico
+		images\smsc_logo.jpg = images\smsc_logo.jpg
 		images\smsc_logo.png = images\smsc_logo.png
 	EndProjectSection
 EndProject

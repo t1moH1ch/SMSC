@@ -8,10 +8,10 @@
     <Title>SMSC</Title>
     <Authors>Timoxa</Authors>
     <Description>Unofficial client .NET for the service smsc.ru that allows developers to use HTTP-based API for sending and receiving phone calls and text messages.</Description>
-    <PackageProjectUrl>https://github.com/9507645380/SMSC</PackageProjectUrl>
-    <PackageIcon>smsc_logo.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/t1moH1ch/SMSC</PackageProjectUrl>
+    <PackageIcon>smsc_logo.jpg</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/9507645380/SMSC</RepositoryUrl>
+    <RepositoryUrl>https://github.com/t1moH1ch/SMSC</RepositoryUrl>
     <PackageTags>smsc sms send call twofactor authentication smscru smsc.ru authorization registration</PackageTags>
     <PackageOutputPath>$(SolutionDir)\artifacts\Nuget</PackageOutputPath>
     <PackageReleaseNotes></PackageReleaseNotes>
@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\images\smsc_logo.png">
+    <None Include="..\..\images\smsc_logo.jpg">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

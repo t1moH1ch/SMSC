@@ -22,7 +22,7 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
-    <BaseOutputPath>$(SolutionDir)\artifacts</BaseOutputPath>
-    <OutDir>$(SolutionDir)\artifacts\Release</OutDir>
+    <BaseOutputPath>./artifacts</BaseOutputPath>
+    <OutDir>./artifacts/Release</OutDir>
   </PropertyGroup>
 </Project>

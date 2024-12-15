@@ -26,6 +26,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{153658
 		images\smsc_logo.png = images\smsc_logo.png
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{B8146F1D-84B2-4E3B-8863-19DED6A3E52F}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		ci.yaml = ci.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +55,6 @@ Global
 		{30D3EDE8-2BC8-4E32-8A68-573ED44B38CA} = {72AF494D-668D-4EE3-847D-5BEDDB5AEE50}
 		{0C78E56F-50A8-4494-BE11-83136B93CEE9} = {CCEA1E4E-C149-4A1E-8D3B-D331610EAE0C}
 		{15365809-DED4-4B49-B107-F6CB3F258CE6} = {40B724C5-15D6-4778-9F50-39A9006FA84F}
+		{B8146F1D-84B2-4E3B-8863-19DED6A3E52F} = {40B724C5-15D6-4778-9F50-39A9006FA84F}
 	EndGlobalSection
 EndGlobal

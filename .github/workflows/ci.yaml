@@ -38,7 +38,7 @@ jobs:
 
       - name: Generate NuGet package
         run: |
-          dotnet pack SMSC/ \
+          dotnet pack src/SMSC \
           --configuration Release \
           -p:PackageVersion=${{ needs.generate-version.outputs.new_version }} \
           -p:RepositoryUrl=https://github.com/t1moH1ch/SMSC \

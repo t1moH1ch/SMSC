@@ -1,5 +1,9 @@
 ﻿namespace SMSC.Http;
 
+/// <summary>
+/// Обработка запросов для получения статуса отправленного СМС
+/// </summary>
+/// <param name="configuration"></param>
 public class HttpSmsStatus(
     ProviderConfiguration configuration) : HttpAbstract(configuration)
 {
@@ -18,6 +22,9 @@ public class HttpSmsStatus(
     /// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
     /// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
     /// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
+    /// </param>
+    /// <param name="config">Конфигурация отправляемого сообщения</param>
+    /// <param name="cancellationToken">Токен отмены операции</param>
     /// <exception cref="MessageMaxLengthException"/>
     public virtual async Task<IEnumerable<HttpSmsStatusResponse>> CheckSms(string client, SmsStatusConfiguration config, CancellationToken cancellationToken = default)
     {
@@ -34,7 +41,6 @@ public class HttpSmsStatus(
     /// <summary>
     /// Настройка строки запроса
     /// </summary>
-    /// <param name="config">Конфигурация для отправки запроса</param>
     /// <returns>Список параметров в виде словаря (ключ-значение)</returns>
     /// <exception cref="ArgumentException"/>
     protected override Dictionary<string, string> GetQueryDictionary()

@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Неверный формат номера телефона
+/// </summary>
 public class HttpSmsPhoneNumberFormatException : SmsExceptionAbstract
 {
     /// <summary>

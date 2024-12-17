@@ -15,9 +15,10 @@
     <PackageTags>smsc sms send call twofactor authentication smscru smsc.ru authorization registration</PackageTags>
     <PackageOutputPath>$(SolutionDir)\artifacts\Nuget</PackageOutputPath>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <Version>1.0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -49,6 +50,7 @@
     <Using Include="SMSC.Exceptions" />
     <Using Include="SMSC.Exceptions.HttpSms" />
     <Using Include="SMSC.Exceptions.HttpSmsStatus" />
+    <Using Include="SMSC.Http" />
     <Using Include="SMSC.Responses" />
     <Using Include="SMSC.Responses.Converters" />
     <Using Include="SMSC.Types" />
@@ -61,6 +63,7 @@
     <Using Include="System.Text.Json" />
     <Using Include="System.Text.Json.Serialization" />
     <Using Include="System.Text.RegularExpressions" />
+    <Using Include="System.Web" />
   </ItemGroup>
 
 </Project>

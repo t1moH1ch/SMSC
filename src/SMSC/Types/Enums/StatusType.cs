@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types.Enums;
 
+/// <summary>
+/// Структура для конфигурации доступных параметров составления запроса баланса
+/// </summary>
 public enum StatusType
 {
     /// <summary>

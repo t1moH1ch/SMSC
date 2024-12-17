@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Responses;
 
+/// <summary>
+/// Структура ответа для запроса баланса
+/// </summary>
 public class HttpSmsBalanceResponse
 {
     /// <summary>

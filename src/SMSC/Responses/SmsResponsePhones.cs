@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Responses;
 
+/// <summary>
+/// Структура ответа для запроса списка телефонных номеров. Для каждого номера будет записана данная структура
+/// </summary>
 public class SmsResponsePhones
 {
     /// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types;
 
+/// <summary>
+/// Настройки конфигурации подключения к серверу
+/// </summary>
 public class ProviderConfiguration
 {
     private readonly Uri _smscApiAddress = new("https://smsc.ru/sys/");

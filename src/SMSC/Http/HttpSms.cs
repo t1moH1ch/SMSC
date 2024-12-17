@@ -1,7 +1,9 @@
-﻿using System.Web;
+﻿namespace SMSC.Http;
 
-namespace SMSC.Http;
-
+/// <summary>
+/// Класс для отправки СМС сообщений 
+/// </summary>
+/// <param name="configuration"></param>
 public class HttpSms(
 	ProviderConfiguration configuration) : HttpAbstract(configuration)
 {
@@ -12,23 +14,25 @@ public class HttpSms(
 	/// </summary>
 	protected override string SiteAddressCommand { get; } = "send.php";
 
-	/// <summary>
-	/// Отправка СМС клиенту на номер <paramref name="client"/> с текстом <paramref name="message"/>
-	/// </summary>
-	/// <param name="client">Номер мобильного телефона в международном формате, на который отправляется сообщение. 
-	/// Номер могут передаваться без знака "+". Если номер передан без знака "+", то он может быть исправлен автоматическим 
-	/// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
-	/// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
-	/// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
-	/// Для <b>telegram</b> в качестве получателя сообщения возможно указание ника абонента или его ID в виде #ID.</param>
-	/// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
-	/// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
-	/// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
-	/// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
-	/// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
-	/// предназначенные для просмотра отправителем истории в личном кабинете.</param>
-	/// <exception cref="MessageMaxLengthException"/>
-	public virtual async Task<HttpSmsResponse> SendSms(string? client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Отправка СМС клиенту на номер <paramref name="client"/> с текстом <paramref name="message"/>
+    /// </summary>
+    /// <param name="client">Номер мобильного телефона в международном формате, на который отправляется сообщение. 
+    /// Номер могут передаваться без знака "+". Если номер передан без знака "+", то он может быть исправлен автоматическим 
+    /// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
+    /// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
+    /// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
+    /// Для <b>telegram</b> в качестве получателя сообщения возможно указание ника абонента или его ID в виде #ID.</param>
+    /// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
+    /// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
+    /// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
+    /// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
+    /// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
+    /// предназначенные для просмотра отправителем истории в личном кабинете.</param>
+    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    /// <exception cref="MessageMaxLengthException"/>
+    public virtual async Task<HttpSmsResponse> SendSms(string? client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(client, nameof(client));
 
@@ -44,24 +48,26 @@ public class HttpSms(
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
-	/// <summary>
-	/// Отправка одного и того же СМС списку клиентов <paramref name="clients"/> с текстом <paramref name="message"/>
-	/// </summary>
-	/// <param name="client">Номер мобильного телефона в международном формате, на который отправляется сообщение. 
-	/// Номер могут передаваться без знака "+". Если номер передан без знака "+", то он может быть исправлен автоматическим 
-	/// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
-	/// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
-	/// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
-	/// Для <b>telegram</b> в качестве получателя сообщения возможно указание ника абонента или его ID в виде #ID.</param>
-	/// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
-	/// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
-	/// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
-	/// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
-	/// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
-	/// предназначенные для просмотра отправителем истории в личном кабинете.</param>
-	/// <exception cref="MessageMaxLengthException"/>
-	/// <exception cref="ArgumentOutOfRangeException"/>
-	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<string?> clients, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Отправка одного и того же СМС списку клиентов <paramref name="clients"/> с текстом <paramref name="message"/>
+    /// </summary>
+    /// <param name="clients">Номер мобильного телефона в международном формате, на который отправляется сообщение. 
+    /// Номер могут передаваться без знака "+". Если номер передан без знака "+", то он может быть исправлен автоматическим 
+    /// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
+    /// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
+    /// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
+    /// Для <b>telegram</b> в качестве получателя сообщения возможно указание ника абонента или его ID в виде #ID.</param>
+    /// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
+    /// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
+    /// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
+    /// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
+    /// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
+    /// предназначенные для просмотра отправителем истории в личном кабинете.</param>
+    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    /// <exception cref="MessageMaxLengthException"/>
+    /// <exception cref="ArgumentOutOfRangeException"/>
+    public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<string?> clients, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		if (!clients.Any())
 			throw new ArgumentOutOfRangeException(nameof(clients), "Clients can`t be empty. Try fill it.");
@@ -81,12 +87,14 @@ public class HttpSms(
 			.CreateHttpSmsResponseAsync(config);
 	}
 
-	/// <summary>
-	/// Отправка списка номеров телефонов и соответствующих им сообщений
-	/// </summary>
-	/// <param name="sendItems">Список номеров телефонов и соответствующих им сообщений</param>
-	/// <exception cref="MessageMaxLengthException"/>
-	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItem> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Отправка списка номеров телефонов и соответствующих им сообщений
+    /// </summary>
+    /// <param name="sendItems">Список номеров телефонов и соответствующих им сообщений</param>
+    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    /// <exception cref="MessageMaxLengthException"/>
+    public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItem> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		if (!sendItems.Any())
 			throw new ArgumentOutOfRangeException(nameof(sendItems), "Send items can`t be empty. Try fill it.");
@@ -102,14 +110,16 @@ public class HttpSms(
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
-	/// <summary>
-	/// В случае необходимости передачи разных имен отправителей (и, возможно, различных часовых поясов абонентов 
-	/// (работает только для запросов, в которых параметр <see cref="SmsConfiguration.Time"/> представлен в виде <see cref="TimeFormat.Full"/>)) 
-	/// для разных сообщений
-	/// </summary>
-	/// <param name="sendItems">Список номеров телефонов и соответствующих им сообщений</param>
-	/// <exception cref="MessageMaxLengthException"/>
-	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItemComplicated> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// В случае необходимости передачи разных имен отправителей (и, возможно, различных часовых поясов абонентов 
+    /// (работает только для запросов, в которых параметр <see cref="SmsConfiguration.Time"/> представлен в виде <see cref="TimeFormat.Full"/>)) 
+    /// для разных сообщений
+    /// </summary>
+    /// <param name="sendItems">Список номеров телефонов и соответствующих им сообщений</param>
+    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    /// <exception cref="MessageMaxLengthException"/>
+    public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItemComplicated> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		if (!sendItems.Any())
 			throw new ArgumentOutOfRangeException(nameof(sendItems), "Send items can`t be empty. Try fill it.");
@@ -125,19 +135,21 @@ public class HttpSms(
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
-	/// <summary>
-	/// Отправка сообщения <see href="https://www.smsc.ru/api/http/send/group/">группе номеров</see>.
-	/// </summary>
-	/// <param name="groupId">Идентификатор группы номеров. Отредактировать можно <see href="https://www.smsc.ru/groups/edit/">здесь</see>.</param>
-	/// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
-	/// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
-	/// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
-	/// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
-	/// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
-	/// предназначенные для просмотра отправителем истории в личном кабинете.</param>
-	/// <exception cref="MessageMaxLengthException"/>
-	/// <exception cref="InvalidOperationException"/>
-	public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Отправка сообщения <see href="https://www.smsc.ru/api/http/send/group/">группе номеров</see>.
+    /// </summary>
+    /// <param name="groupId">Идентификатор группы номеров. Отредактировать можно <see href="https://www.smsc.ru/groups/edit/">здесь</see>.</param>
+    /// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
+    /// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
+    /// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
+    /// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
+    /// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
+    /// предназначенные для просмотра отправителем истории в личном кабинете.</param>
+    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
+    /// <param name="cancellationToken">Токен отмены</param>
+    /// <exception cref="MessageMaxLengthException"/>
+    /// <exception cref="InvalidOperationException"/>
+    public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		ArgumentException.ThrowIfNullOrEmpty(groupId, nameof(groupId));
 
@@ -165,7 +177,6 @@ public class HttpSms(
 	/// <summary>
 	/// Настройка строки запроса
 	/// </summary>
-	/// <param name="config">Конфигурация для отправки запроса</param>
 	/// <returns>Список параметров в виде словаря (ключ-значение)</returns>
 	/// <exception cref="ArgumentNullException"/>
 	/// <exception cref="ArgumentOutOfRangeException"/>
@@ -291,7 +302,6 @@ public class HttpSms(
 	/// При использовании одного из параметров (отправка email или прикрепление файла к сообщению)
 	/// запрос должен отправляться методом POST
 	/// </summary>
-	/// <param name="config">Список параметров запроса</param>
 	/// <returns>
 	/// <see langword="true"/> - необходимо использовать метод POST<br/>
 	/// <see langword="false"/> - необходимо использовать метод GET

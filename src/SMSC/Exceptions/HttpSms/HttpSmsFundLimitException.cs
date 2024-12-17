@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Ошибка - недостаточно средств на счете для отправки сообщения
+/// </summary>
 public class HttpSmsFundLimitException : SmsExceptionAbstract
 {
     /// <summary>

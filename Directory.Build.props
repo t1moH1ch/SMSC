@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <BaseOutputPath>$(SolutionDir)\artifacts</BaseOutputPath>
-    <OutDir>$(SolutionDir)\artifacts</OutDir>
+    <OutDir>$(SolutionDir)\artifacts\Debug</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>

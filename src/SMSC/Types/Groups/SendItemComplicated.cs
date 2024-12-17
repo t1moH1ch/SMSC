@@ -1,5 +1,11 @@
 ﻿namespace SMSC.Types.Groups;
 
+/// <summary>
+/// Структура для составления списка номеров в запросе
+/// </summary>
+/// <param name="sender">Имя отправителя</param>
+/// <param name="phone">Номер телефона с + или без</param>
+/// <param name="message">Сообщение</param>
 public record SendItemComplicated(
     string sender,
     string phone,

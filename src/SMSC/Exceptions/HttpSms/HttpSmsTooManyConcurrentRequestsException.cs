@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Слишком частая отправка одного и того же запроса за короткий промежуток времени
+/// </summary>
 public class HttpSmsTooManyConcurrentRequestsException : SmsExceptionAbstract
 {
     /// <summary>

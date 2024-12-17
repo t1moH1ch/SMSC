@@ -1,5 +1,9 @@
 ﻿namespace SMSC.Types;
 
+/// <summary>
+/// Конфигурация для настройки запроса при <see cref="SmsConfiguration.SmsType"/> = <see cref="SmsType.Call"/><br/>
+/// В остальных случаях данная структура не используется в составлении запроса.
+/// </summary>
 public class CallConfiguration
 {
     private int _wait, _repeatSpan, _retryCount;
@@ -66,6 +70,9 @@ public class CallConfiguration
         }
     }
 
+    /// <summary>
+    /// Конструктор для задания стандартных значений некоторых параметров
+    /// </summary>
     public CallConfiguration()
     {
         Wait = 22;

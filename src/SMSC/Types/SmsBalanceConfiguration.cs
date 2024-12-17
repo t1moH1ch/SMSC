@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types;
 
+/// <summary>
+/// Структура конфигурации для запроса баланса
+/// </summary>
 public class SmsBalanceConfiguration : IConfiguration
 {
     /// <summary>

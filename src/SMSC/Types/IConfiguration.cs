@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types;
 
+/// <summary>
+/// Интерфейс для обощения конфигураций абстракции <see cref="HttpAbstract"/>
+/// </summary>
 public interface IConfiguration
 {
     /// <summary>

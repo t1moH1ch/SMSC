@@ -49,8 +49,10 @@
     <Using Include="SMSC.Exceptions" />
     <Using Include="SMSC.Exceptions.HttpSms" />
     <Using Include="SMSC.Exceptions.HttpSmsStatus" />
+    <Using Include="SMSC.Exceptions.StatusErrors" />
     <Using Include="SMSC.Responses" />
     <Using Include="SMSC.Responses.Converters" />
+    <Using Include="SMSC.Responses.StatusCodes" />
     <Using Include="SMSC.Types" />
     <Using Include="SMSC.Types.Enums" />
     <Using Include="SMSC.Types.Groups" />

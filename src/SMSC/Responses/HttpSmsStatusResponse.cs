@@ -5,8 +5,8 @@ public class HttpSmsStatusResponse
     /// <summary>
     /// код статуса (<seealso href="https://smsc.ru/api/http/status_messages/statuses/">список</seealso>)
     /// </summary>
-    [JsonPropertyName("status")]
-    public int? Status { get; set; }
+    [JsonPropertyName("status"), JsonConverter(typeof(StringToStatusConverter))]
+    public IStatusCode? Status { get; set; }
     /// <summary>
     /// Дата последнего изменения статуса. Формат DD.MM.YYYY hh:mm:ss.
     /// </summary>
@@ -27,8 +27,8 @@ public class HttpSmsStatusResponse
     /// <summary>
     /// Код ошибки, если сообщение не было доставлено.
     /// </summary>
-    [JsonPropertyName("err")]
-    public int? ErrorCode { get; set; }
+    [JsonPropertyName("err"), JsonConverter(typeof(StringToErrorCodeConverter))]
+    public ISmsError? ErrorCode { get; set; }
     /// <summary>
     /// Дата отправки сообщения (формат DD.MM.YYYY hh:mm:ss).
     /// </summary>

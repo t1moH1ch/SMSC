@@ -33,7 +33,7 @@ public class HttpSmsStatusTest
     [Fact]
     public async Task GetDefaultStatusWithApi()
     {
-        var id = await CreateItemAsyncTest(Phone);
+        var id = await CreateItemAsyncTest(Phone2);
         Assert.NotNull(id);
 
         _httpSmsStatus = new HttpSmsStatus(new ProviderConfiguration(ApiKey));
@@ -42,7 +42,7 @@ public class HttpSmsStatusTest
             Id = id,
         };
 
-        var statusRes = await _httpSmsStatus.CheckSms(Phone.ToString(), statusConfig);
+        var statusRes = await _httpSmsStatus.CheckSms(Phone2.ToString(), statusConfig);
         Assert.NotNull(statusRes);
         Assert.NotEmpty(statusRes);
     }

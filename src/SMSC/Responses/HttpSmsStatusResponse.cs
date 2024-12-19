@@ -8,8 +8,8 @@ public class HttpSmsStatusResponse
     /// <summary>
     /// код статуса (<seealso href="https://smsc.ru/api/http/status_messages/statuses/">список</seealso>)
     /// </summary>
-    [JsonPropertyName("status")]
-    public int? Status { get; set; }
+    [JsonPropertyName("status"), JsonConverter(typeof(StringToStatusJsonConverter))]
+    public IStatusCode? Status { get; set; }
     /// <summary>
     /// Дата последнего изменения статуса. Формат DD.MM.YYYY hh:mm:ss.
     /// </summary>
@@ -30,8 +30,8 @@ public class HttpSmsStatusResponse
     /// <summary>
     /// Код ошибки, если сообщение не было доставлено.
     /// </summary>
-    [JsonPropertyName("err")]
-    public int? ErrorCode { get; set; }
+    [JsonPropertyName("err"), JsonConverter(typeof(StringToErrorCodeJsonConverter))]
+    public ISmsError? ErrorCode { get; set; }
     /// <summary>
     /// Дата отправки сообщения (формат DD.MM.YYYY hh:mm:ss).
     /// </summary>
@@ -101,8 +101,8 @@ public class HttpSmsStatusResponse
     /// Тип сообщения (0 – SMS, 1 – Flash-SMS, 2 – Бинарное SMS, 3 – Wap-push, 4 – HLR-запрос, 
     /// 5 – Ping-SMS, 6 – MMS, 7 – Звонок, 8 – E-mail, 10 – Viber, 12 – Соцсети).
     /// </summary>
-    [JsonPropertyName("type")]
-    public int? MessageType { get; set; }
+    [JsonPropertyName("type"), JsonConverter(typeof(IntToSmsTypeJsonConverter))]
+    public SmsType? MessageType { get; set; }
     /// <summary>
     /// Количество частей в SMS-сообщении (либо секунд в голосовом сообщении).
     /// </summary>

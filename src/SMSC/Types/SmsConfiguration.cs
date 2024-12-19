@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types;
 
+/// <summary>
+/// Структура конфигурации для отправки СМС сообщений
+/// </summary>
 public class SmsConfiguration : IConfiguration
 {
     private int? _smsRequire;
@@ -135,7 +138,7 @@ public class SmsConfiguration : IConfiguration
     /// </summary>
     public string? BotName { get; set; }
     /// <summary>
-    /// Список параметров для голосового сообщения. Используется только при <see cref="UseCall"/> = <see langword="true"/>
+    /// Список параметров для голосового сообщения. Используется только при <see cref="SmsType"/> = <see cref="SmsType.Call"/>
     /// </summary>
     public CallConfiguration CallConfiguration { get; set; } = new CallConfiguration();
 

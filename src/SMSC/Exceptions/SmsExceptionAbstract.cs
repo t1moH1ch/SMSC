@@ -1,4 +1,8 @@
 ﻿namespace SMSC.Exceptions;
+
+/// <summary>
+/// абстракция класса ощей ошибки, формируемой сервисом в ответ на запрос
+/// </summary>
 public abstract class SmsExceptionAbstract : Exception
 {
     /// <summary>

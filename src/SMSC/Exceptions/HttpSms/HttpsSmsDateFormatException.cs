@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Ошибка в формате даты
+/// </summary>
 public class HttpSmsDateFormatException : SmsExceptionAbstract
 {
     /// <summary>

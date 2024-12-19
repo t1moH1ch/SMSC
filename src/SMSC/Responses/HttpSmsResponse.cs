@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Responses;
 
+/// <summary>
+/// Структура ответа сервера
+/// </summary>
 public class HttpSmsResponse
 {
     /// <summary>

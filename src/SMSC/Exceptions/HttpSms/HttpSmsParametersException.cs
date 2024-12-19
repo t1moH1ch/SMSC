@@ -1,5 +1,9 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Ошибка в параметрах отправляемого сообщения
+/// </summary>
+/// <param name="message"></param>
 public class HttpSmsParametersException(
     string? message = null) : SmsExceptionAbstract
 {

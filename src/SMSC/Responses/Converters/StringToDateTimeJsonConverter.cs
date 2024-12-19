@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Responses.Converters;
 
+/// <summary>
+/// JSON конвертер из строки в <see cref="DateTime"/> формат
+/// </summary>
 public class StringToDateTimeJsonConverter : JsonConverter<DateTime?>
 {
     /// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Ошибка авторизации в сервисе
+/// </summary>
 public class HttpSmsWrongCredentialsException : SmsExceptionAbstract
 {
     /// <summary>

@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Ошибка отправки сообщения (отсутствует имя отправителя или по тексту сообщения)
+/// </summary>
 public class HttpSmsMessageForbiddenException : SmsExceptionAbstract
 {
     /// <summary>

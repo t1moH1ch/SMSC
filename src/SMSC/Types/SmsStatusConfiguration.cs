@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types;
 
+/// <summary>
+/// Структура конфигурации для запроса статуса сообщения
+/// </summary>
 public class SmsStatusConfiguration : IConfiguration
 {
     /// <summary>

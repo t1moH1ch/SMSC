@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSmsStatus;
 
+/// <summary>
+/// Ошибка удаления сообщения
+/// </summary>
 public class HttpSmsStatusDeleteException : SmsExceptionAbstract
 {
     /// <summary>

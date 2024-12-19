@@ -20,11 +20,11 @@ public class SmsResponsePhones
     /// <summary>
     /// Код статуса SMS-сообщения.
     /// </summary>
-    [JsonPropertyName("status"), JsonConverter(typeof(StringToStatusConverter))]
+    [JsonPropertyName("status"), JsonConverter(typeof(StringToStatusJsonConverter))]
     public IStatusCode? Status { get; set; }
     /// <summary>
     /// Код ошибки в статусе.
     /// </summary>
-    [JsonPropertyName("error"), JsonConverter(typeof(StringToErrorCodeConverter))]
+    [JsonPropertyName("error"), JsonConverter(typeof(StringToErrorCodeJsonConverter))]
     public ISmsError? Error { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace SMSC.Responses.Converters;
 
-internal class StringToStatusConverter : JsonConverter<IStatusCode>
+internal class StringToStatusJsonConverter : JsonConverter<IStatusCode>
 {
     public override IStatusCode? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

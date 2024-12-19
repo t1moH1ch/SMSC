@@ -1,6 +1,6 @@
 ﻿namespace SMSC.Responses.Converters;
 
-internal class StringToErrorCodeConverter : JsonConverter<ISmsError>
+internal class StringToErrorCodeJsonConverter : JsonConverter<ISmsError>
 {
     public override ISmsError? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

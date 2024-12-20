@@ -26,7 +26,7 @@ jobs:
 
   package-and-publish-lib:
     runs-on: ubuntu-latest
-    needs: [generate-version, create-release]
+    needs: generate-version
 
     steps:
       - uses: actions/checkout@v2
@@ -44,16 +44,16 @@ jobs:
           -p:RepositoryUrl=https://github.com/t1moH1ch/SMSC \
           -o packages
 
-      - name: Publish package in GitHub
-        run: dotnet nuget push packages/*.nupkg --api-key ${{ secrets.PUSH_NUGET }} --source https://nuget.pkg.github.com/t1moH1ch/index.json
-
       - name: Publish package in Nuget
         run: dotnet nuget push packages/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+
+      - name: Publish package in GitHub
+        run: dotnet nuget push packages/*.nupkg --api-key ${{ secrets.PUSH_NUGET }} --source https://nuget.pkg.github.com/t1moH1ch/index.json
 
   create-release:
     name: Create Release
     runs-on: ubuntu-latest
-    needs: generate-version
+    needs: [generate-version, package-and-publish-lib]
 
     steps:
       - name: Checkout code

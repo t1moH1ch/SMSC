@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Временная блокировка IP-адреса
+/// </summary>
 public class HttpSmsIPAddressBlockException : SmsExceptionAbstract
 {
     /// <summary>

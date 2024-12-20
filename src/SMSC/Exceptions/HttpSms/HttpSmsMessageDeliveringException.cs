@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Exceptions.HttpSms;
 
+/// <summary>
+/// Ошибка доставки сообщения
+/// </summary>
 public class HttpSmsMessageDeliveringException : SmsExceptionAbstract
 {
     /// <summary>

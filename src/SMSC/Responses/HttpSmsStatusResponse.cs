@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Responses;
 
+/// <summary>
+/// Структура ответа для запроса статуса сообщения
+/// </summary>
 public class HttpSmsStatusResponse
 {
     /// <summary>

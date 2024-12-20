@@ -1,5 +1,9 @@
 ﻿namespace SMSC.Http;
 
+/// <summary>
+/// Класс для создания запроса баланса счета
+/// </summary>
+/// <param name="providerConfiguration">настройки подключения к серверу</param>
 public class HttpSmsBalance(
     ProviderConfiguration providerConfiguration) : HttpAbstract(providerConfiguration)
 {
@@ -15,7 +19,7 @@ public class HttpSmsBalance(
     /// </summary>
     /// <param name="config">Список параметров сообщения</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    /// <returns></returns>
+    /// <returns>Данные в формате <see cref="HttpSmsBalanceResponse"/></returns>
     /// <exception cref="MessageMaxLengthException"/>
     public virtual async Task<HttpSmsBalanceResponse> CheckBalance(SmsBalanceConfiguration config, CancellationToken cancellationToken = default)
     {
@@ -28,7 +32,6 @@ public class HttpSmsBalance(
     /// <summary>
     /// Настройка строки запроса
     /// </summary>
-    /// <param name="config">Конфигурация для отправки запроса</param>
     /// <returns>Список параметров в виде словаря (ключ-значение)</returns>
     /// <exception cref="ArgumentException"/>
     protected override Dictionary<string, string> GetQueryDictionary()

@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types.Enums;
 
+/// <summary>
+/// Список доступных для создания запроса типов СМС сообщений
+/// </summary>
 public enum SmsType
 {
     /// <summary>

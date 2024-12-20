@@ -1,10 +1,12 @@
 ﻿namespace SMSC;
 
+/// <summary>
+/// Расширение для создания структурированных ответов сервера
+/// </summary>
 public static class HttpSmsResponseExtensions
 {
     /// <summary>
-    /// Расширение для сериализации ответа от сервера. Поддерживается только JSON формат ответа сервера, 
-    /// в остальных случаях ответ сервера записывается в <see cref="HttpSmsResponse.ResponseString"/>.
+    /// Расширение для сериализации ответа от сервера. Поддерживается только <i>JSON</i> формат ответа сервера.
     /// </summary>
     /// <param name="response">Ответ сервера</param>
     /// <param name="config">Настройки запроса</param>
@@ -51,8 +53,7 @@ public static class HttpSmsResponseExtensions
         return json is null ? throw new InvalidOperationException("Something went wrong. Response read stopped.") : json;
     }
     /// <summary>
-    /// Расширение для сериализации ответа от сервера. Поддерживается только JSON формат ответа сервера, 
-    /// в остальных случаях ответ сервера записывается в <see cref="HttpSmsResponse.ResponseString"/>.
+    /// Расширение для сериализации ответа от сервера. Поддерживается только <i>JSON</i> формат ответа сервера.
     /// </summary>
     /// <param name="response">Ответ сервера</param>
     /// <param name="config">Настройки запроса</param>
@@ -102,8 +103,7 @@ public static class HttpSmsResponseExtensions
         }
     }
     /// <summary>
-    /// Расширение для сериализации ответа от сервера. Поддерживается только JSON формат ответа сервера, 
-    /// в остальных случаях ответ сервера записывается в <see cref="HttpSmsResponse.ResponseString"/>.
+    /// Расширение для сериализации ответа от сервера. Поддерживается только <i>JSON</i> формат ответа сервера.
     /// </summary>
     /// <param name="response">Ответ сервера</param>
     /// <param name="config">Настройки запроса</param>
@@ -142,17 +142,18 @@ public static class HttpSmsResponseExtensions
     }
 
     /// <summary>
-    /// Получение ответа от сервера
+    /// Проверяем формат ответа сервера
     /// </summary>
-    /// <param name="response">ответ от срвера</param>
+    /// <param name="response">Oтвет от сервера</param>
     /// <param name="config">Список параметров запроса</param>
     /// <returns>Строка ответа, возвращаемая сервером</returns>
-    /// <exception cref="NotSupportedException"></exception>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="NotSupportedException"/>
+    /// <exception cref="ArgumentNullException"/>
     private static async Task<string> EnsureCorrectResponseType(HttpResponseMessage response, IConfiguration config)
     {
         response.EnsureSuccessStatusCode();
 
+        //Для ответов в кодировках, отлиных от UTF-8, зарегистрируем другие
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         var content = await response.Content.ReadAsStringAsync();

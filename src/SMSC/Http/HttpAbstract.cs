@@ -7,7 +7,13 @@
 public abstract class HttpAbstract(
     ProviderConfiguration configuration)
 {
+    /// <summary>
+    /// Настройки подключения
+    /// </summary>
     protected ProviderConfiguration ProviderConfig = configuration ?? throw new ArgumentNullException(nameof(configuration));
+    /// <summary>
+    /// Клиент web-request
+    /// </summary>
     protected readonly HttpClient _httpClient = new();
 
     /// <summary>
@@ -31,7 +37,7 @@ public abstract class HttpAbstract(
     /// <summary>
     /// Создание тела запроса в соостветствии с настройками
     /// </summary>
-    /// <param name="addClietsMessages">Пользовательская функция</param>
+    /// <param name="addClientsMessage">Пользовательская функция</param>
     /// <returns>Настроенный объект класса <see cref="HttpRequestMessage"/></returns>
     protected virtual HttpRequestMessage CreateRequest(Action<Dictionary<string, string>>? addClientsMessage = null)
     {
@@ -52,7 +58,6 @@ public abstract class HttpAbstract(
     /// <summary>
     /// Настройка строки запроса
     /// </summary>
-    /// <param name="config">Конфигурация для отправки запроса</param>
     /// <returns>Список параметров в виде словаря (ключ-значение)</returns>
     protected abstract Dictionary<string, string> GetQueryDictionary();
     /// <summary>
@@ -115,7 +120,6 @@ public abstract class HttpAbstract(
     /// При использовании одного из параметров (отправка email или прикрепление файла к сообщению)
     /// запрос должен отправляться методом POST
     /// </summary>
-    /// <param name="config">Список параметров запроса</param>
     /// <returns>
     /// <see langword="true"/> - необходимо использовать метод POST<br/>
     /// <see langword="false"/> - необходимо использовать метод GET

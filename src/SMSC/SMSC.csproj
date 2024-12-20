@@ -51,6 +51,7 @@
     <Using Include="SMSC.Exceptions.HttpSms" />
     <Using Include="SMSC.Exceptions.HttpSmsStatus" />
     <Using Include="SMSC.Exceptions.StatusErrors" />
+    <Using Include="SMSC.Http" />
     <Using Include="SMSC.Responses" />
     <Using Include="SMSC.Responses.Converters" />
     <Using Include="SMSC.Responses.StatusCodes" />

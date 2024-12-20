@@ -1,5 +1,9 @@
 ﻿namespace SMSC.Http;
 
+/// <summary>
+/// Абстракция для классов, работающих с API smsc.ru
+/// </summary>
+/// <param name="configuration"></param>
 public abstract class HttpAbstract(
     ProviderConfiguration configuration)
 {

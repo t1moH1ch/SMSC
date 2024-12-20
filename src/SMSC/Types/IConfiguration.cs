@@ -1,5 +1,8 @@
 ﻿namespace SMSC.Types;
 
+/// <summary>
+/// Интерфейс для общих параметров конфигурации запросов
+/// </summary>
 public interface IConfiguration
 {
     /// <summary>

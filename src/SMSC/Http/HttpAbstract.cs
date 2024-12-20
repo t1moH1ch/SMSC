@@ -1,7 +1,7 @@
 ﻿namespace SMSC.Http;
 
 /// <summary>
-/// Абстракция класса для создания запросов
+/// Абстракция для классов, работающих с API smsc.ru
 /// </summary>
 /// <param name="configuration"></param>
 public abstract class HttpAbstract(

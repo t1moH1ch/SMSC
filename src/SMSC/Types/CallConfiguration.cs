@@ -32,8 +32,15 @@ public class CallConfiguration
         get => _wait;
         set
         {
+#if NET_CORE_APP_8
             ArgumentOutOfRangeException.ThrowIfLessThan(value, 0);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 99);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 99);   
+#else
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value));
+            if (value > 99)
+                throw new ArgumentOutOfRangeException(nameof(value));
+#endif
 
             _wait = value;
         }
@@ -48,8 +55,15 @@ public class CallConfiguration
         get => _repeatSpan;
         set
         {
+#if NET_CORE_APP_8
             ArgumentOutOfRangeException.ThrowIfLessThan(value, 10);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 3600);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 3600);   
+#else
+            if (value < 10)
+                throw new ArgumentOutOfRangeException(nameof(value));
+            if (value > 3600)
+                throw new ArgumentOutOfRangeException(nameof(value));
+#endif
 
             _repeatSpan = value;
         }
@@ -63,8 +77,16 @@ public class CallConfiguration
         get => _retryCount;
         set
         {
+#if NET_CORE_APP_8
             ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 9);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 9);   
+#else
+            if (value < 1)
+                throw new ArgumentOutOfRangeException(nameof(value));
+            if (value > 9)
+                throw new ArgumentOutOfRangeException(nameof(value));
+#endif
+
 
             _retryCount = value;
         }

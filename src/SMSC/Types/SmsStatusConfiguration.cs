@@ -12,7 +12,11 @@ public class SmsStatusConfiguration : IConfiguration
     /// Идентификатор представляет собой 32-битное число в диапазоне от 1 до 2147483647, 
     /// либо строку длиной до 40 символов, состоящую из латинских букв, цифр и символов ".-_"
     /// </summary>
+#if NET_CORE_APP_8
     public required string? Id { get; set; }
+#else
+    public string? Id { get; set; }
+#endif
     /// <summary>
     /// Формат ответа сервера об успешной отправке.<br/>
     /// По умолчанию <see cref="ResponseFormat.Default"/>
@@ -36,4 +40,15 @@ public class SmsStatusConfiguration : IConfiguration
     /// <seealso href="https://smsc.ru/api/http/status_messages/delete/#menu">здесь</seealso>.
     /// </summary>
     public bool Delete { get; set; }
+
+#if !NET_CORE_APP_8
+    /// <summary>
+    /// Конструктор для версии .NET меньше 8.0
+    /// </summary>
+    /// <param name="id"></param>
+    public SmsStatusConfiguration(string id)
+	{
+        Id = id;
+	}
+#endif
 }

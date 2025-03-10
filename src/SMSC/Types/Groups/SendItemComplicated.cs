@@ -6,7 +6,11 @@
 /// <param name="sender">Имя отправителя</param>
 /// <param name="phone">Номер телефона с + или без</param>
 /// <param name="message">Сообщение</param>
+#if NET_CORE_APP
 public record SendItemComplicated(
+#else
+public class SendItemComplicated(
+#endif
     string sender,
     string phone,
     string message) : SendItem(phone, message)

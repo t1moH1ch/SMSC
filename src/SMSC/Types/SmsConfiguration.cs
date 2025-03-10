@@ -68,8 +68,15 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
+#if NET_CORE_APP_8
                 ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(6));
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, TimeSpan.FromHours(720));
+#else
+                if (value.Value < TimeSpan.FromMinutes(6))
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+                if (value.Value > TimeSpan.FromHours(720))
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+#endif
             }
 
             _period = value;
@@ -88,8 +95,15 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
+#if NET_CORE_APP_8
                 ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(1));
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, TimeSpan.FromMinutes(1440));
+#else
+                if (value.Value < TimeSpan.FromMinutes(1))
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+                if (value.Value > TimeSpan.FromHours(1440))
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+#endif
             }
 
             _frequency = value;
@@ -122,8 +136,15 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
+#if NET_CORE_APP_8
                 ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, 10);
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, 999);
+#else
+                if (value.Value < 10)
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+                if (value.Value > 999)
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+#endif
             }
 
             _smsRequire = value;
@@ -177,8 +198,15 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
+#if NET_CORE_APP_8
                 ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(1));
                 ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, TimeSpan.FromDays(1));
+#else
+                if (value.Value < TimeSpan.FromMinutes(1))
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+                if (value.Value > TimeSpan.FromDays(1))
+                    throw new ArgumentOutOfRangeException(nameof(value.Value));
+#endif
             }
 
             _valid = value;
@@ -230,5 +258,9 @@ public class SmsConfiguration : IConfiguration
     /// <summary>
     /// Список файлов для добавления к запросу.
     /// </summary>
+#if NET_FRAMEWORK
+    public string? Files { get; set; }
+#else
     public MultipartFormDataContent? Files { get; set; }
+#endif
 }

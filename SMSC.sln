@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{40B724C5-15D6-4778-9F50-39A9006FA84F}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 		Directory.Packages.props = Directory.Packages.props
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
@@ -64,5 +65,8 @@ Global
 		{B8146F1D-84B2-4E3B-8863-19DED6A3E52F} = {40B724C5-15D6-4778-9F50-39A9006FA84F}
 		{FBDA5012-FC79-4A7E-8F69-B50BB1418DAC} = {40B724C5-15D6-4778-9F50-39A9006FA84F}
 		{CD87D7D9-0F55-455E-B5B5-C19F1C18CBA8} = {FBDA5012-FC79-4A7E-8F69-B50BB1418DAC}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A232F8E5-C74E-43D7-AF21-901B496DBF20}
 	EndGlobalSection
 EndGlobal

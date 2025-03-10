@@ -1,8 +1,7 @@
 <Project>
   <PropertyGroup>
     <LangVersion>preview</LangVersion>
-    <TargetFramework>net9.0</TargetFramework>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -10,8 +9,10 @@
     <DebugType>embedded</DebugType>
     <Utf8Output>true</Utf8Output>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
-    <Version>1.0.2</Version>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -26,5 +27,41 @@
     <DebugSymbols>false</DebugSymbols>
     <BaseOutputPath>../../artifacts</BaseOutputPath>
     <OutDir>../../artifacts/Release</OutDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NetFrameworkTargetFrameworks Condition=" '$(NetFrameworkTargetFrameworks)' == '' ">
+      net462;
+      net472;
+      net48
+    </NetFrameworkTargetFrameworks>
+
+    <NetCoreTargetFrameworks Condition=" '$(NetCoreTargetFrameworks)' == '' ">
+      net6.0;
+      net8.0;
+      net9.0
+    </NetCoreTargetFrameworks>
+
+    <NetStandardTargetFrameworks Condition=" '$(NetStandardTargetFrameworks)' == '' ">
+      netstandard2.0;
+      netstandard2.1
+    </NetStandardTargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Artem Vorotov</Authors>
+    <Company>$(Authors)</Company>
+    <Product>SMSC</Product>
+    <Title>SMSC</Title>
+    <Description>Unofficial client .NET for the service smsc.ru that allows developers to use HTTP-based API for sending and receiving phone calls and text messages.</Description>
+    <_ProjectCopyright>© Artem Vorotov. All rights reserved.</_ProjectCopyright>
+    <ApplicationIcon>$(MSBuildThisFileDirectory)smsc_logo.ico</ApplicationIcon>
+    <PackageIconFullPath>$(MSBuildThisFileDirectory)smsc_logo.jpg</PackageIconFullPath>
+    <PackageProjectUrl>https://github.com/t1moH1ch/SMSC</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageTags>smsc;sms;send;call;twofactor;authentication;smscru;smsc.ru;authorization;registration</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/t1moH1ch/SMSC</RepositoryUrl>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
 </Project>

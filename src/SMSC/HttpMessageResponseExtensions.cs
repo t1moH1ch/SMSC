@@ -1,4 +1,8 @@
-﻿namespace SMSC;
+﻿#if NET_FRAMEWORK_AND_NET_STANDARD
+using Newtonsoft.Json;
+#endif
+
+namespace SMSC;
 
 /// <summary>
 /// Расширение для создания структурированных ответов сервера
@@ -26,10 +30,24 @@ public static class HttpSmsResponseExtensions
     {
         var content = await EnsureCorrectResponseType(response, config);
 
+#if NET_CORE_APP_AND_NET_STANDARD_21
         if (content.Contains("error_code", StringComparison.CurrentCultureIgnoreCase))
+#else
+        if (content.Contains("error_code"))
+#endif
         {
+#if NET_CORE_APP
             var error = await response.Content.ReadFromJsonAsync<HttpSmsErrorResponse>();
+#else
+            var errorString = await response.Content.ReadAsStringAsync();
+            var error = JsonConvert.DeserializeObject<HttpSmsErrorResponse>(errorString);
+#endif
+#if NET_CORE_APP_8
             ArgumentNullException.ThrowIfNull(error);
+#else
+            if (error is null)
+                throw new ArgumentNullException(nameof(error));
+#endif
 
             throw error.ErrorCode switch
             {
@@ -45,11 +63,18 @@ public static class HttpSmsResponseExtensions
                 _ => new InvalidCastException("Unknown server exception."),
             };
         }
-
+#if NET_CORE_APP
         var json = await response.Content.ReadFromJsonAsync<HttpSmsResponse>(new JsonSerializerOptions
         {
             NumberHandling = JsonNumberHandling.AllowReadingFromString
         });
+#else
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var json = JsonConvert.DeserializeObject<HttpSmsResponse>(jsonString, new JsonSerializerSettings
+        {
+            FloatParseHandling = FloatParseHandling.Decimal
+        });
+#endif
         return json is null ? throw new InvalidOperationException("Something went wrong. Response read stopped.") : json;
     }
     /// <summary>
@@ -68,11 +93,24 @@ public static class HttpSmsResponseExtensions
     public static async Task<IEnumerable<HttpSmsStatusResponse>> CreateHttpSmsStatusResponseAsync(this HttpResponseMessage response, SmsStatusConfiguration config)
     {
         var content = await EnsureCorrectResponseType(response, config);
-
+#if NET_CORE_APP_AND_NET_STANDARD_21
         if (content.Contains("error_code", StringComparison.CurrentCultureIgnoreCase))
+#else
+        if (content.Contains("error_code"))
+#endif
         {
+#if NET_CORE_APP
             var error = await response.Content.ReadFromJsonAsync<HttpSmsErrorResponse>();
+#else
+            var errorString = await response.Content.ReadAsStringAsync();
+            var error = JsonConvert.DeserializeObject<HttpSmsErrorResponse>(errorString);
+#endif
+#if NET_CORE_APP_8
             ArgumentNullException.ThrowIfNull(error);
+#else
+            if (error is null)
+                throw new ArgumentNullException(nameof(error));
+#endif
 
             throw error.ErrorCode switch
             {
@@ -85,20 +123,40 @@ public static class HttpSmsResponseExtensions
             };
         }
 
+#if NET_CORE_APP
         if (!content.StartsWith('['))
+#else
+        if (!content.StartsWith("["))
+#endif
         {
+#if NET_CORE_APP
             var json = await response.Content.ReadFromJsonAsync<HttpSmsStatusResponse>(new JsonSerializerOptions
             {
                 NumberHandling = JsonNumberHandling.AllowReadingFromString
             });
+#else
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var json = JsonConvert.DeserializeObject<HttpSmsStatusResponse>(jsonString, new JsonSerializerSettings
+            {
+                FloatParseHandling = FloatParseHandling.Decimal
+            });
+#endif
             return json is null ? throw new InvalidOperationException("Something went wrong. Response read stopped.") : new List<HttpSmsStatusResponse>() { json };
         }
         else
         {
+#if NET_CORE_APP
             var json = await response.Content.ReadFromJsonAsync<List<HttpSmsStatusResponse>>(new JsonSerializerOptions
             {
                 NumberHandling = JsonNumberHandling.AllowReadingFromString
             });
+#else
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var json = JsonConvert.DeserializeObject<List<HttpSmsStatusResponse>>(jsonString, new JsonSerializerSettings
+            {
+                FloatParseHandling = FloatParseHandling.Decimal
+            });
+#endif
             return json is null ? throw new InvalidOperationException("Something went wrong. Response read stopped.") : json;
         }
     }
@@ -118,11 +176,24 @@ public static class HttpSmsResponseExtensions
     public static async Task<HttpSmsBalanceResponse> CreateHttpSmsBalanceResponseAsync(this HttpResponseMessage response, SmsBalanceConfiguration config)
     {
         var content = await EnsureCorrectResponseType(response, config);
-
+#if NET_CORE_APP_AND_NET_STANDARD_21
         if (content.Contains("error_code", StringComparison.CurrentCultureIgnoreCase))
+#else
+        if (content.Contains("error_code"))
+#endif
         {
+#if NET_CORE_APP
             var error = await response.Content.ReadFromJsonAsync<HttpSmsErrorResponse>();
+#else
+            var errorString = await response.Content.ReadAsStringAsync();
+            var error = JsonConvert.DeserializeObject<HttpSmsErrorResponse>(errorString);
+#endif
+#if NET_CORE_APP
             ArgumentNullException.ThrowIfNull(error);
+#else
+            if (error is null)
+                throw new ArgumentNullException(nameof(error));
+#endif
 
             throw error.ErrorCode switch
             {
@@ -134,10 +205,18 @@ public static class HttpSmsResponseExtensions
             };
         }
 
+#if NET_CORE_APP
         var json = await response.Content.ReadFromJsonAsync<HttpSmsBalanceResponse>(new JsonSerializerOptions
         {
             NumberHandling = JsonNumberHandling.AllowReadingFromString
         });
+#else
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var json = JsonConvert.DeserializeObject<HttpSmsBalanceResponse>(jsonString, new JsonSerializerSettings
+        {
+            FloatParseHandling = FloatParseHandling.Decimal
+        });
+#endif
         return json is null ? throw new InvalidOperationException("Something went wrong. Response read stopped.") : json;
     }
 
@@ -153,11 +232,18 @@ public static class HttpSmsResponseExtensions
     {
         response.EnsureSuccessStatusCode();
 
+#if NET_CORE_APP
         //Для ответов в кодировках, отлиных от UTF-8, зарегистрируем другие
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
 
         var content = await response.Content.ReadAsStringAsync();
+#if NET_CORE_APP_8
         ArgumentException.ThrowIfNullOrEmpty(content);
+#else
+        if (string.IsNullOrEmpty(content))
+            throw new ArgumentNullException(nameof(content));
+#endif
         if (config.ResponseFormat != ResponseFormat.Json)
             throw new NotSupportedException("Only JSON format is supported for server response.");
 

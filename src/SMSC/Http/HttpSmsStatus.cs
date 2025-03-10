@@ -59,7 +59,12 @@ public class HttpSmsStatus(
 
         if (_smsConfiguration!.Delete)
         {
+#if NET_CORE_APP_8
             ArgumentException.ThrowIfNullOrEmpty(_smsConfiguration!.Id);
+#else
+            if (string.IsNullOrEmpty(_smsConfiguration.Id))
+                throw new ArgumentNullException(nameof(_smsConfiguration.Id));
+#endif
             @params.Add("del", "1");
         }
 
@@ -78,7 +83,11 @@ public class HttpSmsStatus(
             {
                 case StatusType.Full: @params.Add("all", "1"); break;
                 case StatusType.Additional: @params.Add("all", "2"); break;
+#if NET_CORE_APP
                 default: throw new ArgumentException($"Unknown status type - {Enum.GetName(_smsConfiguration.StatusType)}");
+#else
+                default: throw new ArgumentException($"Unknown status type - {Enum.GetName(typeof(StatusType), _smsConfiguration.StatusType)}");
+#endif
             }
         }
     }

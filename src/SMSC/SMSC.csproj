@@ -1,24 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <ApplicationIcon>smsc_logo.ico</ApplicationIcon>
-    <Title>SMSC</Title>
-    <Authors>Timoxa</Authors>
-    <Description>Unofficial client .NET for the service smsc.ru that allows developers to use HTTP-based API for sending and receiving phone calls and text messages.</Description>
-    <PackageProjectUrl>https://github.com/t1moH1ch/SMSC</PackageProjectUrl>
-    <PackageIcon>smsc_logo.jpg</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/t1moH1ch/SMSC</RepositoryUrl>
-    <PackageTags>smsc sms send call twofactor authentication smscru smsc.ru authorization registration</PackageTags>
+    <TargetFrameworks>
+      $(NetFrameworkTargetFrameworks);
+      $(NetCoreTargetFrameworks);
+      $(NetStandardTargetFrameworks)
+    </TargetFrameworks>
     <PackageOutputPath>$(SolutionDir)\artifacts\Nuget</PackageOutputPath>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <SignAssembly>False</SignAssembly>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <Version>1.0.7</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,6 +34,19 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
+    <Reference Include="System.Net.Http" />
+    <Using Include="System.Net.Http"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" ('$(TargetFrameworkIdentifier)' == '.NETFramework') Or ('$(TargetFrameworkIdentifier)' == '.NETStandard') ">
+    <PackageReference Include="Newtonsoft.Json" />
+  </ItemGroup>
+  <ItemGroup Condition=" ('$(TargetFrameworkIdentifier)' == '.NetCore') Or ('$(TargetFrameworkIdentifier)' == '.NetCoreApp') ">
+    <Using Include="System.Text.Json" />
+    <Using Include="System.Text.Json.Serialization" />
+  </ItemGroup>
+
   <ItemGroup>
     <Using Include="SMSC.Exceptions" />
     <Using Include="SMSC.Exceptions.HttpSms" />
@@ -62,8 +63,6 @@
     <Using Include="System.Net" />
     <Using Include="System.Net.Http.Json" />
     <Using Include="System.Text" />
-    <Using Include="System.Text.Json" />
-    <Using Include="System.Text.Json.Serialization" />
     <Using Include="System.Text.RegularExpressions" />
     <Using Include="System.Web" />
   </ItemGroup>

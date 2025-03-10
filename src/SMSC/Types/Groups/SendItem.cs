@@ -5,7 +5,11 @@
 /// </summary>
 /// <param name="phone"></param>
 /// <param name="message"></param>
+#if NET_CORE_APP
 public record SendItem(
+#else
+public class SendItem(
+#endif
     string phone,
     string message)
 {

@@ -34,7 +34,12 @@ public class HttpSms(
     /// <exception cref="MessageMaxLengthException"/>
     public virtual async Task<HttpSmsResponse> SendSms(string? client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
+#if NET_CORE_APP_8
 		ArgumentException.ThrowIfNullOrEmpty(client, nameof(client));
+#else
+		if (client is null)
+			throw new ArgumentNullException(nameof(client));
+#endif
 
 		SmsConfiguration = config;
 		return await (await SendRequest(CreateRequest((@params) =>
@@ -151,7 +156,12 @@ public class HttpSms(
     /// <exception cref="InvalidOperationException"/>
     public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
+#if NET_CORE_APP_8
 		ArgumentException.ThrowIfNullOrEmpty(groupId, nameof(groupId));
+#else
+		if (groupId is null)
+			throw new ArgumentNullException(nameof(groupId));
+#endif
 
 		if (groupId.Contains(",") || groupId.Contains(";"))
 			throw new InvalidOperationException($"{nameof(groupId)} can`t contains , or ;");
@@ -192,7 +202,12 @@ public class HttpSms(
 			@params.Add("id", _smsConfiguration.Id);
 		if (_smsConfiguration!.Sender is not null)
 		{
+#if NET_CORE_APP_8
 			ArgumentOutOfRangeException.ThrowIfGreaterThan(_smsConfiguration!.Sender.Length, 15);
+#else
+			if (_smsConfiguration!.Sender.Length > 15)
+				throw new ArgumentOutOfRangeException(nameof(_smsConfiguration.Sender.Length));
+#endif
 			@params.Add("sender", _smsConfiguration.Sender);
 		}
 		if (_smsConfiguration.Transliteration != Transliteration.Default)
@@ -201,8 +216,12 @@ public class HttpSms(
 			{
 				case Transliteration.Translit: @params.Add("translit", "1"); break;
 				case Transliteration.TranslitExtend: @params.Add("translit", "2"); break;
+#if NET_CORE_APP
 				default: throw new InvalidOperationException($"{Enum.GetName(_smsConfiguration.Transliteration)}");
-			}
+#else
+                default: throw new InvalidOperationException($"{Enum.GetName(typeof(Transliteration), _smsConfiguration.Transliteration)}");
+#endif
+            }
 		}
 		if (_smsConfiguration!.TinyUrl)
 			@params.Add("tinyurl", "1");
@@ -220,7 +239,7 @@ public class HttpSms(
 					@params.Add("time", HttpUtility.UrlEncode("+") + _smsConfiguration!.TimeToSend);
 					break;
 				default:
-					@params.Add("time", _smsConfiguration!.TimeToSend);
+					@params.Add("time", _smsConfiguration!.TimeToSend ?? string.Empty);
 					break;
 			}
 
@@ -261,8 +280,13 @@ public class HttpSms(
 				$"{_smsConfiguration.CallConfiguration.RetryCount}");
 		}
 		if (_smsConfiguration.SmsType == SmsType.Mail)
+#if NET_CORE_APP_8
 			ArgumentException.ThrowIfNullOrEmpty(_smsConfiguration.Subject);
-		if (_smsConfiguration.Subject is not null)
+#else
+			if (string.IsNullOrEmpty(_smsConfiguration.Subject))
+				throw new ArgumentNullException(nameof(_smsConfiguration.Subject));
+#endif
+			if (_smsConfiguration.Subject is not null)
 			@params.Add("subj", _smsConfiguration.Subject);
 
 		AddCharset(@params);
@@ -326,9 +350,13 @@ public class HttpSms(
 			if (_smsConfiguration!.SmsType == SmsType.MMS && _smsConfiguration.FileUrl is null)
 			{
 				if (_smsConfiguration!.Files is not null)
+#if NET_FRAMEWORK
+					request.Content = new StringContent(_smsConfiguration!.Files);
+#else
 					request.Content = _smsConfiguration!.Files;
-			}
-		}
+#endif
+            }
+        }
 
 		return request;
 	}
@@ -380,8 +408,12 @@ public class HttpSms(
 			case SmsType.WhatsApp: key = "whatsapp"; val = "1"; break;
 			case SmsType.Telegram: key = "tg"; val = "1"; break;
 			case SmsType.Call: key = "call"; val = "1"; break;
+#if NET_CORE_APP
 			default: throw new NotImplementedException($"Type {Enum.GetName(_smsConfiguration.SmsType)} is unknown.");
-		}
+#else
+            default: throw new NotImplementedException($"Type {Enum.GetName(typeof(SmsType), _smsConfiguration.SmsType)} is unknown.");
+#endif
+        }
 
 		if (!string.IsNullOrEmpty(key) & !string.IsNullOrEmpty(val))
 			@params.Add(key, val);

@@ -44,7 +44,12 @@ public abstract class HttpAbstract(
         CheckSmsConfiguration();
 
         var paramsDict = CreateCreadentialDictionary();
+#if NET_CORE_APP_8
         ArgumentNullException.ThrowIfNull(paramsDict, nameof(paramsDict));
+#else
+        if (paramsDict is null)
+            throw new ArgumentNullException(nameof(paramsDict));
+#endif
         if (addClientsMessage is not null)
             addClientsMessage(paramsDict);
 
@@ -70,15 +75,27 @@ public abstract class HttpAbstract(
 
         if (ProviderConfig.ApiKey is not null)
         {
+#if NET_CORE_APP_8
             ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.ApiKey);
+#else
+            if (string.IsNullOrEmpty(ProviderConfig.ApiKey))
+                throw new ArgumentNullException(nameof(ProviderConfig.ApiKey));
+#endif
             paramsDict.Add("apikey", ProviderConfig.ApiKey);
         }
         else
         {
+#if NET_CORE_APP_8
             ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.Password);
             ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.Login);
-            paramsDict.Add("login", ProviderConfig.Login);
-            paramsDict.Add("psw", ProviderConfig.Password);
+#else
+            if(string.IsNullOrEmpty(ProviderConfig.Password))
+                throw new ArgumentNullException(nameof(ProviderConfig.Password));
+            if (string.IsNullOrEmpty(ProviderConfig.Login))
+                throw new ArgumentNullException(nameof(ProviderConfig.Login));
+#endif
+            paramsDict.Add("login", ProviderConfig.Login!);
+            paramsDict.Add("psw", ProviderConfig.Password!);
         }
 
         return paramsDict;
@@ -113,7 +130,11 @@ public abstract class HttpAbstract(
 
         return new HttpRequestMessage(HttpMethod.Post, new Uri(ProviderConfig.JsonSmscApiAddress.ToString()))
         {
+#if NET_CORE_APP
             Content = JsonContent.Create(@params)
+#else
+            Content = new StringContent(JsonConvert.SerializeObject(@params))
+#endif
         };
     }
     /// <summary>
@@ -139,7 +160,15 @@ public abstract class HttpAbstract(
     /// <summary>
     /// Проверка корректности конфигурации
     /// </summary>
-    protected virtual void CheckSmsConfiguration() => ArgumentNullException.ThrowIfNull(SmsConfiguration, nameof(SmsConfiguration));
+    protected virtual void CheckSmsConfiguration()
+#if NET_CORE_APP_8
+        => ArgumentNullException.ThrowIfNull(SmsConfiguration, nameof(SmsConfiguration));
+#else
+    {
+        if (SmsConfiguration is null)
+            throw new ArgumentNullException(nameof(SmsConfiguration));
+    }
+#endif
     /// <summary>
     /// Добавление признака формата возвращаемого сообщения
     /// </summary>

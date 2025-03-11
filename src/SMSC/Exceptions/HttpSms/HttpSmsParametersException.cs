@@ -14,5 +14,5 @@ public class HttpSmsParametersException(
     /// <summary>
     /// Ошибка в параметрах.
     /// </summary>
-    public override string Message => string.IsNullOrEmpty(message) ? $"Error in the parameters" : message;
+    public override string Message => string.IsNullOrEmpty(message) ? $"Error in the parameters" : message!;
 }

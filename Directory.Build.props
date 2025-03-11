@@ -19,14 +19,14 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <BaseOutputPath>$(SolutionDir)\artifacts</BaseOutputPath>
-    <OutDir>$(SolutionDir)\artifacts\Debug</OutDir>
+    <OutDir>$(SolutionDir)\artifacts\Debug\$(TargetFramework)</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
     <BaseOutputPath>../../artifacts</BaseOutputPath>
-    <OutDir>../../artifacts/Release</OutDir>
+    <OutDir>../../artifacts/Release\$(TargetFramework)</OutDir>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -55,8 +55,8 @@
     <Title>SMSC</Title>
     <Description>Unofficial client .NET for the service smsc.ru that allows developers to use HTTP-based API for sending and receiving phone calls and text messages.</Description>
     <_ProjectCopyright>© Artem Vorotov. All rights reserved.</_ProjectCopyright>
-    <ApplicationIcon>$(MSBuildThisFileDirectory)smsc_logo.ico</ApplicationIcon>
-    <PackageIconFullPath>$(MSBuildThisFileDirectory)smsc_logo.jpg</PackageIconFullPath>
+    <ApplicationIcon>$(MSBuildThisFileDirectory)images/smsc_logo.ico</ApplicationIcon>
+    <PackageIconFullPath>$(MSBuildThisFileDirectory)images/smsc_logo.jpg</PackageIconFullPath>
     <PackageProjectUrl>https://github.com/t1moH1ch/SMSC</PackageProjectUrl>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageTags>smsc;sms;send;call;twofactor;authentication;smscru;smsc.ru;authorization;registration</PackageTags>

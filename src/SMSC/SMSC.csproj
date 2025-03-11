@@ -36,15 +36,18 @@
 
   <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">
     <Reference Include="System.Net.Http" />
-    <Using Include="System.Net.Http"/>
+    <Reference Include="System.Web" />
+    <Using Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup Condition=" ('$(TargetFrameworkIdentifier)' == '.NETFramework') Or ('$(TargetFrameworkIdentifier)' == '.NETStandard') ">
     <PackageReference Include="Newtonsoft.Json" />
+    <Using Include="Newtonsoft.Json" />
   </ItemGroup>
   <ItemGroup Condition=" ('$(TargetFrameworkIdentifier)' == '.NetCore') Or ('$(TargetFrameworkIdentifier)' == '.NetCoreApp') ">
     <Using Include="System.Text.Json" />
     <Using Include="System.Text.Json.Serialization" />
+    <Using Include="System.Net.Http.Json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,7 +64,6 @@
     <Using Include="SMSC.Types.Groups" />
     <Using Include="System.Globalization" />
     <Using Include="System.Net" />
-    <Using Include="System.Net.Http.Json" />
     <Using Include="System.Text" />
     <Using Include="System.Text.RegularExpressions" />
     <Using Include="System.Web" />

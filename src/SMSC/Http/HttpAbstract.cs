@@ -38,7 +38,7 @@ public abstract class HttpAbstract(
         CheckSmsConfiguration();
 
         var payload = CreateCredentialDictionary();
-        ArgumentNullException.ThrowIfNull(payload, nameof(payload));
+        ThrowHelper.ThrowIfNull(payload, nameof(payload));
         addClientsMessage?.Invoke(payload);
 
         foreach (var pair in GetQueryDictionary())
@@ -66,13 +66,13 @@ public abstract class HttpAbstract(
 
         if (ProviderConfig.ApiKey is not null)
         {
-            ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.ApiKey);
+            ThrowHelper.ThrowIfNullOrEmpty(ProviderConfig.ApiKey);
             paramsDict.Add("apikey", ProviderConfig.ApiKey);
         }
         else
         {
-            ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.Password);
-            ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.Login);
+            ThrowHelper.ThrowIfNullOrEmpty(ProviderConfig.Password);
+            ThrowHelper.ThrowIfNullOrEmpty(ProviderConfig.Login);
             paramsDict.Add("login", ProviderConfig.Login);
             paramsDict.Add("psw", ProviderConfig.Password);
         }
@@ -147,7 +147,11 @@ public abstract class HttpAbstract(
 
         if (message.Content is not null)
         {
-            bodyBytes = await message.Content.ReadAsByteArrayAsync(cancellationToken);
+            bodyBytes = await message.Content.ReadAsByteArrayAsync(
+#if NET5_0_OR_GREATER
+                cancellationToken
+#endif
+            );
             contentType = message.Content.Headers.ContentType?.ToString();
         }
 
@@ -167,7 +171,11 @@ public abstract class HttpAbstract(
 
             lastResponse?.Dispose();
             lastResponse = await _httpClient.SendAsync(request, cancellationToken);
-            var content = await lastResponse.Content.ReadAsStringAsync(cancellationToken);
+            var content = await lastResponse.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                cancellationToken
+#endif
+            );
 
             if (!string.IsNullOrEmpty(content))
             {
@@ -192,7 +200,7 @@ public abstract class HttpAbstract(
     /// <summary>
     /// Проверка корректности конфигурации
     /// </summary>
-    protected virtual void CheckSmsConfiguration() => ArgumentNullException.ThrowIfNull(SmsConfiguration, nameof(SmsConfiguration));
+    protected virtual void CheckSmsConfiguration() => ThrowHelper.ThrowIfNull(SmsConfiguration, nameof(SmsConfiguration));
 
     /// <summary>
     /// Добавление признака формата возвращаемого сообщения

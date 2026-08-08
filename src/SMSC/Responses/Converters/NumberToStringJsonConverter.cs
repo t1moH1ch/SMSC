@@ -21,7 +21,7 @@ internal class NumberToStringJsonConverter : JsonConverter<string>
             return reader.GetString() ?? string.Empty;
         if (reader.TokenType == JsonTokenType.Number)
             return reader.GetInt32().ToString();
-        throw new InvalidCastException($"Unsupported token type {Enum.GetName(reader.TokenType)}");
+        throw new InvalidCastException($"Unsupported token type {reader.TokenType}");
     }
     /// <summary>
     /// Записываем значение как строку вне зависимости от значения

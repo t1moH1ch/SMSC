@@ -1,9 +1,5 @@
 ﻿namespace SMSC.Types;
 
-/// <summary>
-/// Конфигурация для настройки запроса при <see cref="SmsConfiguration.SmsType"/> = <see cref="SmsType.Call"/><br/>
-/// В остальных случаях данная структура не используется в составлении запроса.
-/// </summary>
 public class CallConfiguration
 {
     private int _wait, _repeatSpan, _retryCount;
@@ -32,15 +28,8 @@ public class CallConfiguration
         get => _wait;
         set
         {
-#if NET_CORE_APP_8
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 0);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 99);   
-#else
-            if (value < 0)
-                throw new ArgumentOutOfRangeException(nameof(value));
-            if (value > 99)
-                throw new ArgumentOutOfRangeException(nameof(value));
-#endif
+            ThrowHelper.ThrowIfLessThan(value, 0);
+            ThrowHelper.ThrowIfGreaterThan(value, 99);
 
             _wait = value;
         }
@@ -55,15 +44,8 @@ public class CallConfiguration
         get => _repeatSpan;
         set
         {
-#if NET_CORE_APP_8
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 10);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 3600);   
-#else
-            if (value < 10)
-                throw new ArgumentOutOfRangeException(nameof(value));
-            if (value > 3600)
-                throw new ArgumentOutOfRangeException(nameof(value));
-#endif
+            ThrowHelper.ThrowIfLessThan(value, 10);
+            ThrowHelper.ThrowIfGreaterThan(value, 3600);
 
             _repeatSpan = value;
         }
@@ -77,24 +59,13 @@ public class CallConfiguration
         get => _retryCount;
         set
         {
-#if NET_CORE_APP_8
-            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
-            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, 9);   
-#else
-            if (value < 1)
-                throw new ArgumentOutOfRangeException(nameof(value));
-            if (value > 9)
-                throw new ArgumentOutOfRangeException(nameof(value));
-#endif
-
+            ThrowHelper.ThrowIfLessThan(value, 1);
+            ThrowHelper.ThrowIfGreaterThan(value, 9);
 
             _retryCount = value;
         }
     }
 
-    /// <summary>
-    /// Конструктор для задания стандартных значений некоторых параметров
-    /// </summary>
     public CallConfiguration()
     {
         Wait = 22;

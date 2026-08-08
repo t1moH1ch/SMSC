@@ -26,7 +26,7 @@ public static class HttpSmsResponseExtensions
     {
         var content = await HttpApiErrorHelper.ReadJsonContentAsync(response, config);
 
-        if (content.Contains("error_code", StringComparison.CurrentCultureIgnoreCase))
+        if (content.IndexOf("error_code", StringComparison.CurrentCultureIgnoreCase) >= 0)
         {
             var error = JsonSerializer.Deserialize<HttpSmsErrorResponse>(content)
                 ?? throw new InvalidOperationException("Failed to parse SMSC error response.");
@@ -42,7 +42,7 @@ public static class HttpSmsResponseExtensions
             };
         }
 
-        if (!content.TrimStart().StartsWith('['))
+        if (!content.TrimStart().StartsWith("["))
         {
             var json = JsonSerializer.Deserialize<HttpSmsStatusResponse>(content, JsonOptions);
             return json is null
@@ -61,7 +61,7 @@ public static class HttpSmsResponseExtensions
     {
         var content = await HttpApiErrorHelper.ReadJsonContentAsync(response, config);
 
-        if (content.Contains("error_code", StringComparison.CurrentCultureIgnoreCase))
+        if (content.IndexOf("error_code", StringComparison.CurrentCultureIgnoreCase) >= 0)
         {
             var error = JsonSerializer.Deserialize<HttpSmsErrorResponse>(content)
                 ?? throw new InvalidOperationException("Failed to parse SMSC error response.");
@@ -114,7 +114,7 @@ public static class HttpSmsResponseExtensions
         var content = await HttpApiErrorHelper.ReadJsonContentAsync(response, config);
         HttpApiErrorHelper.ThrowIfError(content);
 
-        if (!content.TrimStart().StartsWith('['))
+        if (!content.TrimStart().StartsWith("["))
         {
             var single = JsonSerializer.Deserialize<T>(content, JsonOptions);
             return single is null

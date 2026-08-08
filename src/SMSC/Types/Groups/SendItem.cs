@@ -29,5 +29,5 @@ public class SendItem(
     /// <see langword="false"/> - (по умолчанию) - специальный режим выключен<br/>
     /// <see langword="true"/> - включение специального режима
     /// </summary>
-    public bool UseNewLineMode { get => Message.Contains('\n'); }
+    public bool UseNewLineMode { get => Message.Contains("\n"); }
 }

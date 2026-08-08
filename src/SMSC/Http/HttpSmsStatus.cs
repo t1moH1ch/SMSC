@@ -34,8 +34,8 @@ public class HttpSmsStatus(
         SmsStatusConfiguration config,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(phones);
-        ArgumentNullException.ThrowIfNull(ids);
+        ThrowHelper.ThrowIfNull(phones);
+        ThrowHelper.ThrowIfNull(ids);
 
         var phoneList = phones.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
         var idList = ids.Where(i => !string.IsNullOrWhiteSpace(i)).ToArray();
@@ -76,7 +76,7 @@ public class HttpSmsStatus(
 
         if (_smsConfiguration!.Delete)
         {
-            ArgumentException.ThrowIfNullOrEmpty(_smsConfiguration!.Id);
+            ThrowHelper.ThrowIfNullOrEmpty(_smsConfiguration!.Id);
             @params.Add("del", "1");
         }
 
@@ -91,7 +91,7 @@ public class HttpSmsStatus(
             {
                 case StatusType.Full: @params.Add("all", "1"); break;
                 case StatusType.Additional: @params.Add("all", "2"); break;
-                default: throw new ArgumentException($"Unknown status type - {Enum.GetName(_smsConfiguration.StatusType)}");
+                default: throw new ArgumentException($"Unknown status type - {_smsConfiguration.StatusType}");
             }
         }
     }

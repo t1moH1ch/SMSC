@@ -8,7 +8,7 @@ internal static class HttpApiErrorHelper
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         var content = await response.Content.ReadAsStringAsync();
-        ArgumentException.ThrowIfNullOrEmpty(content);
+        ThrowHelper.ThrowIfNullOrEmpty(content);
         if (config.ResponseFormat != ResponseFormat.Json)
             throw new NotSupportedException("Only JSON format is supported for server response.");
 
@@ -17,7 +17,7 @@ internal static class HttpApiErrorHelper
 
     public static void ThrowIfError(string content)
     {
-        if (!content.Contains("error_code", StringComparison.OrdinalIgnoreCase))
+        if (content.IndexOf("error_code", StringComparison.OrdinalIgnoreCase) < 0)
             return;
 
         var error = JsonSerializer.Deserialize<HttpSmsErrorResponse>(content)

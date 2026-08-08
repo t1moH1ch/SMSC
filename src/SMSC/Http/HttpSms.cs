@@ -21,7 +21,7 @@ public class HttpSms(
 	/// <exception cref="MessageMaxLengthException"/>
 	public virtual async Task<HttpSmsResponse> SendSms(string? client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
-		ArgumentException.ThrowIfNullOrEmpty(client, nameof(client));
+		ThrowHelper.ThrowIfNullOrEmpty(client, nameof(client));
 		EnsureMessageLength(message);
 
 		SmsConfiguration = config;
@@ -120,16 +120,16 @@ public class HttpSms(
 	/// <exception cref="InvalidOperationException"/>
 	public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
-		ArgumentException.ThrowIfNullOrEmpty(groupId, nameof(groupId));
+		ThrowHelper.ThrowIfNullOrEmpty(groupId, nameof(groupId));
 		EnsureMessageLength(message);
 
-		if (groupId.Contains(',') || groupId.Contains(';'))
+		if (groupId.Contains(",") || groupId.Contains(";"))
 			throw new InvalidOperationException($"{nameof(groupId)} can`t contains , or ;");
 
 		SmsConfiguration = config;
 
 		var group = groupId.Trim();
-		if (group.ToLower().StartsWith('g'))
+		if (group.ToLower().StartsWith("g"))
 			group = group.ToLower().TrimStart('g');
 
 		return await (await SendRequest(CreateRequest((@params) =>
@@ -156,7 +156,7 @@ public class HttpSms(
 			@params.Add("id", _smsConfiguration.Id);
 		if (_smsConfiguration!.Sender is not null)
 		{
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(_smsConfiguration!.Sender.Length, 15);
+			ThrowHelper.ThrowIfGreaterThan(_smsConfiguration!.Sender.Length, 15);
 			@params.Add("sender", _smsConfiguration.Sender);
 		}
 		if (_smsConfiguration.Transliteration != Transliteration.Default)
@@ -165,7 +165,7 @@ public class HttpSms(
 			{
 				case Transliteration.Translit: @params.Add("translit", "1"); break;
 				case Transliteration.TranslitExtend: @params.Add("translit", "2"); break;
-				default: throw new InvalidOperationException($"{Enum.GetName(_smsConfiguration.Transliteration)}");
+				default: throw new InvalidOperationException($"{_smsConfiguration.Transliteration}");
 			}
 		}
 		if (_smsConfiguration!.TinyUrl)
@@ -224,7 +224,7 @@ public class HttpSms(
 				$"{_smsConfiguration.CallConfiguration.RetryCount}");
 		}
 		if (_smsConfiguration.SmsType == SmsType.Mail)
-			ArgumentException.ThrowIfNullOrEmpty(_smsConfiguration.Subject);
+			ThrowHelper.ThrowIfNullOrEmpty(_smsConfiguration.Subject);
 		if (_smsConfiguration.Subject is not null)
 			@params.Add("subj", _smsConfiguration.Subject);
 
@@ -341,13 +341,13 @@ public class HttpSms(
 			case SmsType.Socials: key = "soc"; val = "1"; break;
 			case SmsType.Viber: key = "viber"; val = "1"; break;
 			case SmsType.WhatsApp:
-				ArgumentException.ThrowIfNullOrEmpty(_smsConfiguration.BotName, nameof(_smsConfiguration.BotName));
+				ThrowHelper.ThrowIfNullOrEmpty(_smsConfiguration.BotName, nameof(_smsConfiguration.BotName));
 				if (!_smsConfiguration.BotName.StartsWith("wa:", StringComparison.OrdinalIgnoreCase))
 					throw new ArgumentException("WhatsApp BotName must be in format wa:botnumber.", nameof(_smsConfiguration.BotName));
 				return;
 			case SmsType.Telegram: key = "tg"; val = "1"; break;
 			case SmsType.Call: key = "call"; val = "1"; break;
-			default: throw new NotImplementedException($"Type {Enum.GetName(_smsConfiguration.SmsType)} is unknown.");
+			default: throw new NotImplementedException($"Type {_smsConfiguration.SmsType} is unknown.");
 		}
 
 		if (!string.IsNullOrEmpty(key) & !string.IsNullOrEmpty(val))

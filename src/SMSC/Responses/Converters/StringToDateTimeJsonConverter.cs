@@ -30,10 +30,10 @@ public class StringToDateTimeJsonConverter : JsonConverter<DateTime?>
         if (reader.TokenType == JsonTokenType.Number)
         {
             var propValue = reader.GetInt64();
-            var result = DateTime.UnixEpoch.AddSeconds(propValue).ToLocalTime();
+            var result = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(propValue).ToLocalTime();
             return result;
         }
-        throw new InvalidCastException($"Unsupported token type {Enum.GetName(reader.TokenType)}");
+        throw new InvalidCastException($"Unsupported token type {reader.TokenType}");
     }
     /// <summary>
     /// Записываем значение как строку вне зависимости от значения

@@ -30,7 +30,7 @@ internal class FloatFromStringJsonConverter : JsonConverter<float?>
                 return (float)number;
             return null;
         }
-        throw new InvalidCastException($"Unsupported token type {Enum.GetName(reader.TokenType)}");
+        throw new InvalidCastException($"Unsupported token type {reader.TokenType}");
     }
     /// <summary>
     /// Записываем значение как строку вне зависимости от значения

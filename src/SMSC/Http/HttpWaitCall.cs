@@ -14,7 +14,7 @@ public class HttpWaitCall(
     /// <param name="phone">Номер абонента, который нужно подтвердить.</param>
     public virtual async Task<HttpWaitCallResponse> RequestAsync(string phone, WaitCallConfiguration? config = null, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrEmpty(phone, nameof(phone));
+        ThrowHelper.ThrowIfNullOrEmpty(phone, nameof(phone));
         SmsConfiguration = config ?? new WaitCallConfiguration();
 
         return await (await SendRequest(CreateRequest(p => p.Add("phone", phone)), cancellationToken))

@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
     <LangVersion>preview</LangVersion>
+    <TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
@@ -9,59 +10,25 @@
     <DebugType>embedded</DebugType>
     <Utf8Output>true</Utf8Output>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <UseCommonOutputDirectory>false</UseCommonOutputDirectory>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <RepoRoot>$([MSBuild]::EnsureTrailingSlash($([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))))</RepoRoot>
   </PropertyGroup>
+
+  <!-- netstandard2.0 reference assemblies lack nullability annotations used by modern APIs -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <NoWarn>$(NoWarn);CS8601;CS8603;CS8604;CS8777</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <BaseOutputPath>$(SolutionDir)\artifacts</BaseOutputPath>
-    <OutDir>$(SolutionDir)\artifacts\Debug\$(TargetFramework)</OutDir>
+    <BaseOutputPath>$(RepoRoot)artifacts\</BaseOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
-    <BaseOutputPath>../../artifacts</BaseOutputPath>
-    <OutDir>../../artifacts/Release\$(TargetFramework)</OutDir>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <NetFrameworkTargetFrameworks Condition=" '$(NetFrameworkTargetFrameworks)' == '' ">
-      net462;
-      net472;
-      net48
-    </NetFrameworkTargetFrameworks>
-
-    <NetCoreTargetFrameworks Condition=" '$(NetCoreTargetFrameworks)' == '' ">
-      net6.0;
-      net8.0;
-      net9.0
-    </NetCoreTargetFrameworks>
-
-    <NetStandardTargetFrameworks Condition=" '$(NetStandardTargetFrameworks)' == '' ">
-      netstandard2.0;
-      netstandard2.1
-    </NetStandardTargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <Authors>Artem Vorotov</Authors>
-    <Company>$(Authors)</Company>
-    <Product>SMSC</Product>
-    <Title>SMSC</Title>
-    <Description>Unofficial client .NET for the service smsc.ru that allows developers to use HTTP-based API for sending and receiving phone calls and text messages.</Description>
-    <_ProjectCopyright>© Artem Vorotov. All rights reserved.</_ProjectCopyright>
-    <ApplicationIcon>$(MSBuildThisFileDirectory)images/smsc_logo.ico</ApplicationIcon>
-    <PackageIconFullPath>$(MSBuildThisFileDirectory)images/smsc_logo.jpg</PackageIconFullPath>
-    <PackageProjectUrl>https://github.com/t1moH1ch/SMSC</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageTags>smsc;sms;send;call;twofactor;authentication;smscru;smsc.ru;authorization;registration</PackageTags>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/t1moH1ch/SMSC</RepositoryUrl>
-    <SignAssembly>False</SignAssembly>
+    <BaseOutputPath>$(RepoRoot)artifacts\</BaseOutputPath>
   </PropertyGroup>
 </Project>

@@ -1,8 +1,5 @@
 ﻿namespace SMSC.Types;
 
-/// <summary>
-/// Структура конфигурации для запроса статуса сообщения
-/// </summary>
 public class SmsStatusConfiguration : IConfiguration
 {
     /// <summary>
@@ -10,20 +7,17 @@ public class SmsStatusConfiguration : IConfiguration
     /// Служит для дальнейшей идентификации сообщения. 
     /// Если не указывать, то будет назначен автоматически. Не обязательно уникален. 
     /// Идентификатор представляет собой 32-битное число в диапазоне от 1 до 2147483647, 
-    /// либо строку длиной до 40 символов, состоящую из латинских букв, цифр и символов ".-_"
+    /// либо строку длиной до 40 символов, состоящую из латинских букв, цифр и символов ".-_".
+    /// Несколько идентификаторов можно передать через запятую.
     /// </summary>
-#if NET_CORE_APP_8
     public required string? Id { get; set; }
-#else
-    public string? Id { get; set; }
-#endif
     /// <summary>
     /// Формат ответа сервера об успешной отправке.<br/>
     /// По умолчанию <see cref="ResponseFormat.Default"/>
     /// </summary>
     public ResponseFormat ResponseFormat { get; set; } = ResponseFormat.Json;
     /// <summary>
-    /// Информация, котороую содержит возвращаемое сообщение<br/>
+    /// Информация, которую содержит возвращаемое сообщение<br/>
     /// Значение по умолчанию - <see cref="StatusType.Default"/>
     /// </summary>
     public StatusType StatusType { get; set; } = StatusType.Default;
@@ -40,15 +34,9 @@ public class SmsStatusConfiguration : IConfiguration
     /// <seealso href="https://smsc.ru/api/http/status_messages/delete/#menu">здесь</seealso>.
     /// </summary>
     public bool Delete { get; set; }
-
-#if !NET_CORE_APP_8
     /// <summary>
-    /// Конструктор для версии .NET меньше 8.0
+    /// Признак запроса статуса сообщения, отправленного через Telegram-бота (<c>bot=1</c>).
+    /// При <see langword="true"/> параметры phone и id не используются.
     /// </summary>
-    /// <param name="id"></param>
-    public SmsStatusConfiguration(string id)
-	{
-        Id = id;
-	}
-#endif
+    public bool Bot { get; set; }
 }

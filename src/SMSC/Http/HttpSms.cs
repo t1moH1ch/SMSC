@@ -1,11 +1,10 @@
-﻿namespace SMSC.Http;
+﻿using System.Web;
 
-/// <summary>
-/// Класс для отправки СМС сообщений 
-/// </summary>
-/// <param name="configuration"></param>
+namespace SMSC.Http;
+
 public class HttpSms(
-	ProviderConfiguration configuration) : HttpAbstract(configuration)
+	ProviderConfiguration configuration,
+	HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
 	private SmsConfiguration? _smsConfiguration => SmsConfiguration as SmsConfiguration;
 
@@ -14,32 +13,17 @@ public class HttpSms(
 	/// </summary>
 	protected override string SiteAddressCommand { get; } = "send.php";
 
-    /// <summary>
-    /// Отправка СМС клиенту на номер <paramref name="client"/> с текстом <paramref name="message"/>
-    /// </summary>
-    /// <param name="client">Номер мобильного телефона в международном формате, на который отправляется сообщение. 
-    /// Номер могут передаваться без знака "+". Если номер передан без знака "+", то он может быть исправлен автоматическим 
-    /// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
-    /// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
-    /// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
-    /// Для <b>telegram</b> в качестве получателя сообщения возможно указание ника абонента или его ID в виде #ID.</param>
-    /// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
-    /// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
-    /// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
-    /// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
-    /// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
-    /// предназначенные для просмотра отправителем истории в личном кабинете.</param>
-    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <exception cref="MessageMaxLengthException"/>
-    public virtual async Task<HttpSmsResponse> SendSms(string? client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+	/// <inheritdoc/>
+	protected override bool SupportsJsonRequestFormat => true;
+
+	/// <summary>
+	/// Отправка СМС клиенту на номер <paramref name="client"/> с текстом <paramref name="message"/>
+	/// </summary>
+	/// <exception cref="MessageMaxLengthException"/>
+	public virtual async Task<HttpSmsResponse> SendSms(string? client, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
-#if NET_CORE_APP_8
-		ArgumentException.ThrowIfNullOrEmpty(client, nameof(client));
-#else
-		if (client is null)
-			throw new ArgumentNullException(nameof(client));
-#endif
+		ThrowHelper.ThrowIfNullOrEmpty(client, nameof(client));
+		EnsureMessageLength(message);
 
 		SmsConfiguration = config;
 		return await (await SendRequest(CreateRequest((@params) =>
@@ -48,35 +32,23 @@ public class HttpSms(
 			if (config.SmsType != SmsType.HLR & config.SmsType != SmsType.Ping)
 			{
 				if (message is not null)
-					@params.Add("mes", message.ToString());
+					@params.Add("mes", message);
 			}
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
-    /// <summary>
-    /// Отправка одного и того же СМС списку клиентов <paramref name="clients"/> с текстом <paramref name="message"/>
-    /// </summary>
-    /// <param name="clients">Номер мобильного телефона в международном формате, на который отправляется сообщение. 
-    /// Номер могут передаваться без знака "+". Если номер передан без знака "+", то он может быть исправлен автоматическим 
-    /// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
-    /// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
-    /// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
-    /// Для <b>telegram</b> в качестве получателя сообщения возможно указание ника абонента или его ID в виде #ID.</param>
-    /// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
-    /// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
-    /// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
-    /// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
-    /// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
-    /// предназначенные для просмотра отправителем истории в личном кабинете.</param>
-    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <exception cref="MessageMaxLengthException"/>
-    /// <exception cref="ArgumentOutOfRangeException"/>
-    public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<string?> clients, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+
+	/// <summary>
+	/// Отправка одного и того же СМС списку клиентов <paramref name="clients"/> с текстом <paramref name="message"/>
+	/// </summary>
+	/// <exception cref="MessageMaxLengthException"/>
+	/// <exception cref="ArgumentOutOfRangeException"/>
+	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<string?> clients, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		if (!clients.Any())
 			throw new ArgumentOutOfRangeException(nameof(clients), "Clients can`t be empty. Try fill it.");
 
+		EnsureMessageLength(message);
 		SmsConfiguration = config;
 
 		var phones = string.Join(PhonesDelimeter, clients.Where(c => !string.IsNullOrEmpty(c)).Select(c => c!.ToString()));
@@ -86,23 +58,23 @@ public class HttpSms(
 			if (config.SmsType != SmsType.HLR & config.SmsType != SmsType.Ping)
 			{
 				if (message is not null)
-					@params.Add("mes", message.ToString());
+					@params.Add("mes", message);
 			}
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
 
-    /// <summary>
-    /// Отправка списка номеров телефонов и соответствующих им сообщений
-    /// </summary>
-    /// <param name="sendItems">Список номеров телефонов и соответствующих им сообщений</param>
-    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <exception cref="MessageMaxLengthException"/>
-    public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItem> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
+	/// <summary>
+	/// Отправка списка номеров телефонов и соответствующих им сообщений
+	/// </summary>
+	/// <exception cref="MessageMaxLengthException"/>
+	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItem> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		if (!sendItems.Any())
 			throw new ArgumentOutOfRangeException(nameof(sendItems), "Send items can`t be empty. Try fill it.");
+
+		foreach (var item in sendItems)
+			EnsureMessageLength(item.Message);
 
 		SmsConfiguration = config;
 
@@ -115,19 +87,20 @@ public class HttpSms(
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
-    /// <summary>
-    /// В случае необходимости передачи разных имен отправителей (и, возможно, различных часовых поясов абонентов 
-    /// (работает только для запросов, в которых параметр <see cref="SmsConfiguration.Time"/> представлен в виде <see cref="TimeFormat.Full"/>)) 
-    /// для разных сообщений
-    /// </summary>
-    /// <param name="sendItems">Список номеров телефонов и соответствующих им сообщений</param>
-    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <exception cref="MessageMaxLengthException"/>
-    public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItemComplicated> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
+
+	/// <summary>
+	/// В случае необходимости передачи разных имен отправителей (и, возможно, различных часовых поясов абонентов 
+	/// (работает только для запросов, в которых параметр <see cref="SmsConfiguration.Time"/> представлен в виде <see cref="TimeFormat.Full"/>)) 
+	/// для разных сообщений
+	/// </summary>
+	/// <exception cref="MessageMaxLengthException"/>
+	public virtual async Task<HttpSmsResponse> SendSms(IEnumerable<SendItemComplicated> sendItems, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
 		if (!sendItems.Any())
 			throw new ArgumentOutOfRangeException(nameof(sendItems), "Send items can`t be empty. Try fill it.");
+
+		foreach (var item in sendItems)
+			EnsureMessageLength(item.Message);
 
 		SmsConfiguration = config;
 
@@ -140,35 +113,23 @@ public class HttpSms(
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
-    /// <summary>
-    /// Отправка сообщения <see href="https://www.smsc.ru/api/http/send/group/">группе номеров</see>.
-    /// </summary>
-    /// <param name="groupId">Идентификатор группы номеров. Отредактировать можно <see href="https://www.smsc.ru/groups/edit/">здесь</see>.</param>
-    /// <param name="message">Текст отправляемого сообщения. Максимальный размер – 1000 символов. Сообщение при необходимости 
-    /// будет разбито на несколько SMS, отправленных абоненту и оплаченных по отдельности. 
-    /// Размер одного SMS – 160 символов в латинице или 70 символов в кириллице. При разбивке сообщения на несколько SMS в 
-    /// каждую часть добавляется заголовок для объединения частей в одно сообщение на телефоне получателя, 
-    /// и максимальная длина становится 67 для кириллицы и 153 для латинских букв. В текст сообщения можно добавлять <seealso href="https://www.smsc.ru/api/http/send/smsinfo/">комментарии</seealso>, 
-    /// предназначенные для просмотра отправителем истории в личном кабинете.</param>
-    /// <param name="config">Конфигурация запроса для отправки сообщения</param>
-    /// <param name="cancellationToken">Токен отмены</param>
-    /// <exception cref="MessageMaxLengthException"/>
-    /// <exception cref="InvalidOperationException"/>
-    public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
+
+	/// <summary>
+	/// Отправка сообщения <see href="https://www.smsc.ru/api/http/send/group/">группе номеров</see>.
+	/// </summary>
+	/// <exception cref="MessageMaxLengthException"/>
+	/// <exception cref="InvalidOperationException"/>
+	public virtual async Task<HttpSmsResponse> SendGroupSms(string groupId, string? message, SmsConfiguration config, CancellationToken cancellationToken = default)
 	{
-#if NET_CORE_APP_8
-		ArgumentException.ThrowIfNullOrEmpty(groupId, nameof(groupId));
-#else
-		if (groupId is null)
-			throw new ArgumentNullException(nameof(groupId));
-#endif
+		ThrowHelper.ThrowIfNullOrEmpty(groupId, nameof(groupId));
+		EnsureMessageLength(message);
 
 		if (groupId.Contains(",") || groupId.Contains(";"))
 			throw new InvalidOperationException($"{nameof(groupId)} can`t contains , or ;");
 
 		SmsConfiguration = config;
 
-		var group = groupId.ToString().Trim();
+		var group = groupId.Trim();
 		if (group.ToLower().StartsWith("g"))
 			group = group.ToLower().TrimStart('g');
 
@@ -178,19 +139,13 @@ public class HttpSms(
 			if (config.SmsType != SmsType.HLR & config.SmsType != SmsType.Ping)
 			{
 				if (message is not null)
-					@params.Add("mes", message.ToString());
+					@params.Add("mes", message);
 			}
 		}), cancellationToken))
 			.CreateHttpSmsResponseAsync(config);
 	}
 
-	/// <summary>
-	/// Настройка строки запроса
-	/// </summary>
-	/// <returns>Список параметров в виде словаря (ключ-значение)</returns>
-	/// <exception cref="ArgumentNullException"/>
-	/// <exception cref="ArgumentOutOfRangeException"/>
-	/// <exception cref="InvalidOperationException"/>
+	/// <inheritdoc/>
 	protected override Dictionary<string, string> GetQueryDictionary()
 	{
 		CheckSmsConfiguration();
@@ -202,12 +157,7 @@ public class HttpSms(
 			@params.Add("id", _smsConfiguration.Id);
 		if (_smsConfiguration!.Sender is not null)
 		{
-#if NET_CORE_APP_8
-			ArgumentOutOfRangeException.ThrowIfGreaterThan(_smsConfiguration!.Sender.Length, 15);
-#else
-			if (_smsConfiguration!.Sender.Length > 15)
-				throw new ArgumentOutOfRangeException(nameof(_smsConfiguration.Sender.Length));
-#endif
+			ThrowHelper.ThrowIfGreaterThan(_smsConfiguration!.Sender.Length, 15);
 			@params.Add("sender", _smsConfiguration.Sender);
 		}
 		if (_smsConfiguration.Transliteration != Transliteration.Default)
@@ -216,12 +166,8 @@ public class HttpSms(
 			{
 				case Transliteration.Translit: @params.Add("translit", "1"); break;
 				case Transliteration.TranslitExtend: @params.Add("translit", "2"); break;
-#if NET_CORE_APP
-				default: throw new InvalidOperationException($"{Enum.GetName(_smsConfiguration.Transliteration)}");
-#else
-                default: throw new InvalidOperationException($"{Enum.GetName(typeof(Transliteration), _smsConfiguration.Transliteration)}");
-#endif
-            }
+				default: throw new InvalidOperationException($"{_smsConfiguration.Transliteration}");
+			}
 		}
 		if (_smsConfiguration!.TinyUrl)
 			@params.Add("tinyurl", "1");
@@ -239,10 +185,9 @@ public class HttpSms(
 					@params.Add("time", HttpUtility.UrlEncode("+") + _smsConfiguration!.TimeToSend);
 					break;
 				default:
-					@params.Add("time", _smsConfiguration!.TimeToSend ?? string.Empty);
+					@params.Add("time", _smsConfiguration!.TimeToSend);
 					break;
 			}
-
 		}
 		if (_smsConfiguration!.TimeZone is not null)
 			@params.Add("tz", _smsConfiguration!.TimeZone.Value.ToString());
@@ -280,13 +225,8 @@ public class HttpSms(
 				$"{_smsConfiguration.CallConfiguration.RetryCount}");
 		}
 		if (_smsConfiguration.SmsType == SmsType.Mail)
-#if NET_CORE_APP_8
-			ArgumentException.ThrowIfNullOrEmpty(_smsConfiguration.Subject);
-#else
-			if (string.IsNullOrEmpty(_smsConfiguration.Subject))
-				throw new ArgumentNullException(nameof(_smsConfiguration.Subject));
-#endif
-			if (_smsConfiguration.Subject is not null)
+			ThrowHelper.ThrowIfNullOrEmpty(_smsConfiguration.Subject);
+		if (_smsConfiguration.Subject is not null)
 			@params.Add("subj", _smsConfiguration.Subject);
 
 		AddCharset(@params);
@@ -322,56 +262,52 @@ public class HttpSms(
 
 		return @params;
 	}
-	/// <summary>
-	/// При использовании одного из параметров (отправка email или прикрепление файла к сообщению)
-	/// запрос должен отправляться методом POST
-	/// </summary>
-	/// <returns>
-	/// <see langword="true"/> - необходимо использовать метод POST<br/>
-	/// <see langword="false"/> - необходимо использовать метод GET
-	/// </returns>
-	/// <exception cref="ArgumentNullException"/>
-	protected override HttpMethod GetRequestMethod()
+
+	/// <inheritdoc/>
+	protected override HttpMethod GetRequestMethod(Uri requestUri, Dictionary<string, string> payload)
 	{
 		CheckSmsConfiguration();
-		return _smsConfiguration!.Files is not null ? HttpMethod.Post : HttpMethod.Get;
+
+		if (_smsConfiguration!.Files is not null)
+			return HttpMethod.Post;
+		if (_smsConfiguration.SmsType is SmsType.Mail or SmsType.Call)
+			return HttpMethod.Post;
+		if (requestUri.OriginalString.Length > MaxQueryStringLength)
+			return HttpMethod.Post;
+
+		return HttpMethod.Get;
 	}
-	/// <summary>
-	/// Создание объекта <see cref="HttpRequestMessage"/> для отправки запроса
-	/// </summary>
-	/// <param name="requestUri">Строка запроса</param>
-	/// <param name="params">Список параметров запроса</param>
-	/// <returns>Объект класса <see cref="HttpRequestMessage"/></returns>
-	protected override HttpRequestMessage CreateRequestMessage(Uri requestUri, Dictionary<string, string> @params)
+
+	/// <inheritdoc/>
+	protected override bool ShouldPostParametersInBody(Dictionary<string, string> payload)
 	{
-		var request = base.CreateRequestMessage(requestUri, @params);
-		if (!UseJsonRequestFormat)
-		{
-			if (_smsConfiguration!.SmsType == SmsType.MMS && _smsConfiguration.FileUrl is null)
-			{
-				if (_smsConfiguration!.Files is not null)
-#if NET_FRAMEWORK
-					request.Content = new StringContent(_smsConfiguration!.Files);
-#else
-					request.Content = _smsConfiguration!.Files;
-#endif
-            }
-        }
-
-		return request;
+		CheckSmsConfiguration();
+		if (_smsConfiguration!.Files is not null)
+			return false;
+		return _smsConfiguration.SmsType is SmsType.Mail or SmsType.Call
+			|| CreateQueryString(payload).OriginalString.Length > MaxQueryStringLength;
 	}
 
-	/// <summary>
-	/// Добавление параметра nl для мультистрокового соообщения Message
-	/// </summary>
-	/// <param name="params"></param>
+	/// <inheritdoc/>
+	protected override HttpRequestMessage CreateRequestMessage(Uri requestUri, Dictionary<string, string> payload)
+	{
+		if (!UseJsonRequestFormat
+			&& _smsConfiguration!.SmsType == SmsType.MMS
+			&& _smsConfiguration.FileUrl is null
+			&& _smsConfiguration.Files is not null)
+		{
+			return new HttpRequestMessage(HttpMethod.Post, requestUri)
+			{
+				Content = _smsConfiguration.Files
+			};
+		}
+
+		return base.CreateRequestMessage(requestUri, payload);
+	}
+
 	private static void AddNewLineParameter(Dictionary<string, string> @params)
 		=> @params.Add("nl", "1");
-	/// <summary>
-	/// Проверка типа СМС сообщения
-	/// </summary>
-	/// <param name="params">Словарь с параметрами СМС сообщения</param>
-	/// <exception cref="NotImplementedException"/>
+
 	private void AddSmsType(Dictionary<string, string> @params)
 	{
 		string? key, val;
@@ -405,27 +341,20 @@ public class HttpSms(
 			case SmsType.Mail: key = "mail"; val = "1"; break;
 			case SmsType.Socials: key = "soc"; val = "1"; break;
 			case SmsType.Viber: key = "viber"; val = "1"; break;
-			case SmsType.WhatsApp: key = "whatsapp"; val = "1"; break;
+			case SmsType.WhatsApp:
+				ThrowHelper.ThrowIfNullOrEmpty(_smsConfiguration.BotName, nameof(_smsConfiguration.BotName));
+				if (!_smsConfiguration.BotName.StartsWith("wa:", StringComparison.OrdinalIgnoreCase))
+					throw new ArgumentException("WhatsApp BotName must be in format wa:botnumber.", nameof(_smsConfiguration.BotName));
+				return;
 			case SmsType.Telegram: key = "tg"; val = "1"; break;
 			case SmsType.Call: key = "call"; val = "1"; break;
-#if NET_CORE_APP
-			default: throw new NotImplementedException($"Type {Enum.GetName(_smsConfiguration.SmsType)} is unknown.");
-#else
-            default: throw new NotImplementedException($"Type {Enum.GetName(typeof(SmsType), _smsConfiguration.SmsType)} is unknown.");
-#endif
-        }
+			default: throw new NotImplementedException($"Type {_smsConfiguration.SmsType} is unknown.");
+		}
 
 		if (!string.IsNullOrEmpty(key) & !string.IsNullOrEmpty(val))
 			@params.Add(key, val);
 	}
-	/// <summary>
-	/// Проверка на корректность задания параметра СМС сообщения - <see cref="SmsConfiguration.TimeToSend"/>
-	/// в соответствии с параметром <see cref="SmsConfiguration.Time"/>
-	/// </summary>
-	/// <returns>
-	/// <see langword="true"/> - если формат соответствует<br/>
-	/// <see langword="false"/> - если не соответствует
-	/// </returns>
+
 	private bool VerifyTimeToSendParameter()
 	{
 		switch (_smsConfiguration!.Time)

@@ -1,15 +1,11 @@
-﻿namespace SMSC.Types.Groups;
+namespace SMSC.Types.Groups;
 
 /// <summary>
 /// Класс для определения пары телефон-сообщение
 /// </summary>
 /// <param name="phone"></param>
 /// <param name="message"></param>
-#if NET_CORE_APP
 public record SendItem(
-#else
-public class SendItem(
-#endif
     string phone,
     string message)
 {
@@ -29,5 +25,5 @@ public class SendItem(
     /// <see langword="false"/> - (по умолчанию) - специальный режим выключен<br/>
     /// <see langword="true"/> - включение специального режима
     /// </summary>
-    public bool UseNewLineMode { get => Message.Contains('\n'); }
+    public bool UseNewLineMode { get => Message.Contains("\n"); }
 }

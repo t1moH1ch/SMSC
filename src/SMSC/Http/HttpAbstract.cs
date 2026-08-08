@@ -1,20 +1,15 @@
 ﻿namespace SMSC.Http;
 
-/// <summary>
-/// Абстракция для классов, работающих с API smsc.ru
-/// </summary>
-/// <param name="configuration"></param>
 public abstract class HttpAbstract(
-    ProviderConfiguration configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null)
 {
-    /// <summary>
-    /// Настройки подключения
-    /// </summary>
+    protected const int MaxMessageLength = 1000;
+    protected const int MaxQueryStringLength = 2000;
+    private const int MaxFailoverAttempts = 5;
+
     protected ProviderConfiguration ProviderConfig = configuration ?? throw new ArgumentNullException(nameof(configuration));
-    /// <summary>
-    /// Клиент web-request
-    /// </summary>
-    protected readonly HttpClient _httpClient = new();
+    protected readonly HttpClient _httpClient = httpClient ?? new HttpClient();
 
     /// <summary>
     /// Для разделения телефонных номеров в списке
@@ -26,7 +21,7 @@ public abstract class HttpAbstract(
     protected abstract string SiteAddressCommand { get; }
 
     /// <summary>
-    /// Отправка запроса серверу в формате JSON.
+    /// Отправка запроса серверу в формате JSON (только для <c>send.php</c> / <c>rest/send/</c>).
     /// </summary>
     public virtual bool UseJsonRequestFormat { get; set; }
     /// <summary>
@@ -35,144 +30,182 @@ public abstract class HttpAbstract(
     protected virtual IConfiguration? SmsConfiguration { get; set; }
 
     /// <summary>
-    /// Создание тела запроса в соостветствии с настройками
+    /// Создание тела запроса в соответствии с настройками
     /// </summary>
-    /// <param name="addClientsMessage">Пользовательская функция</param>
+    /// <param name="addClientsMessage">Пользовательская функция для phones/mes/list и т.п.</param>
     /// <returns>Настроенный объект класса <see cref="HttpRequestMessage"/></returns>
     protected virtual HttpRequestMessage CreateRequest(Action<Dictionary<string, string>>? addClientsMessage = null)
     {
         CheckSmsConfiguration();
 
-        var paramsDict = CreateCreadentialDictionary();
-#if NET_CORE_APP_8
-        ArgumentNullException.ThrowIfNull(paramsDict, nameof(paramsDict));
-#else
-        if (paramsDict is null)
-            throw new ArgumentNullException(nameof(paramsDict));
-#endif
-        if (addClientsMessage is not null)
-            addClientsMessage(paramsDict);
+        var payload = CreateCredentialDictionary();
+        ThrowHelper.ThrowIfNull(payload, nameof(payload));
+        addClientsMessage?.Invoke(payload);
 
-        var @params = GetQueryDictionary();
-        if (!@params.Any())
-            throw new HttpSmsParametersException($"{nameof(@params)} can`t be empty.");
+        foreach (var pair in GetQueryDictionary())
+            payload[pair.Key] = pair.Value;
 
-        var requestUri = CreateQueryString(paramsDict);
-        return CreateRequestMessage(requestUri, @params);
+        if (payload.Count == 0)
+            throw new HttpSmsParametersException($"{nameof(payload)} can`t be empty.");
+
+        var requestUri = CreateQueryString(payload);
+        return CreateRequestMessage(requestUri, payload);
     }
+
     /// <summary>
     /// Настройка строки запроса
     /// </summary>
     /// <returns>Список параметров в виде словаря (ключ-значение)</returns>
     protected abstract Dictionary<string, string> GetQueryDictionary();
+
     /// <summary>
     /// Создание списка параметров для подключения через логин и пароль либо через ApiKey
     /// </summary>
-    /// <returns>Список параметров для подключения</returns>
-    protected virtual Dictionary<string, string>? CreateCreadentialDictionary()
+    protected virtual Dictionary<string, string> CreateCredentialDictionary()
     {
         var paramsDict = new Dictionary<string, string>();
 
         if (ProviderConfig.ApiKey is not null)
         {
-#if NET_CORE_APP_8
-            ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.ApiKey);
-#else
-            if (string.IsNullOrEmpty(ProviderConfig.ApiKey))
-                throw new ArgumentNullException(nameof(ProviderConfig.ApiKey));
-#endif
+            ThrowHelper.ThrowIfNullOrEmpty(ProviderConfig.ApiKey);
             paramsDict.Add("apikey", ProviderConfig.ApiKey);
         }
         else
         {
-#if NET_CORE_APP_8
-            ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.Password);
-            ArgumentException.ThrowIfNullOrEmpty(ProviderConfig.Login);
-#else
-            if(string.IsNullOrEmpty(ProviderConfig.Password))
-                throw new ArgumentNullException(nameof(ProviderConfig.Password));
-            if (string.IsNullOrEmpty(ProviderConfig.Login))
-                throw new ArgumentNullException(nameof(ProviderConfig.Login));
-#endif
-            paramsDict.Add("login", ProviderConfig.Login!);
-            paramsDict.Add("psw", ProviderConfig.Password!);
+            ThrowHelper.ThrowIfNullOrEmpty(ProviderConfig.Password);
+            ThrowHelper.ThrowIfNullOrEmpty(ProviderConfig.Login);
+            paramsDict.Add("login", ProviderConfig.Login);
+            paramsDict.Add("psw", ProviderConfig.Password);
         }
 
         return paramsDict;
     }
-    /// <summary>
-    /// Создание строки запроса методом GET
-    /// </summary>
-    /// <param name="paramsDict">Список параметров запроса</param>
-    /// <returns>Строка запроса</returns>
-    /// <exception cref="HttpSmsParametersException"></exception>
-    protected virtual Uri CreateQueryString(Dictionary<string, string> paramsDict)
-    {
-        var @params = GetQueryDictionary();
-        if (!@params.Any())
-            throw new HttpSmsParametersException($"{nameof(@params)} can`t be empty.");
 
+    /// <summary>
+    /// Создание URI запроса со всеми параметрами в query string
+    /// </summary>
+    protected virtual Uri CreateQueryString(Dictionary<string, string> payload)
+    {
         var requestUri = new Uri(ProviderConfig.SmscApiAddress.ToString() + SiteAddressCommand);
         return new Uri($"{requestUri}?" +
-            $"{string.Join("&", paramsDict.Select(p => $"{p.Key}={p.Value}"))}&" +
-            $"{string.Join("&", @params.Select(p => $"{p.Key}={p.Value}"))}");
+            string.Join("&", payload.Select(p => $"{p.Key}={p.Value}")));
     }
+
     /// <summary>
     /// Создание объекта <see cref="HttpRequestMessage"/> для отправки запроса
     /// </summary>
-    /// <param name="requestUri">Строка запроса</param>
-    /// <param name="params">Список параметров запроса</param>
-    /// <returns>Объект класса <see cref="HttpRequestMessage"/></returns>
-    protected virtual HttpRequestMessage CreateRequestMessage(Uri requestUri, Dictionary<string, string> @params)
+    protected virtual HttpRequestMessage CreateRequestMessage(Uri requestUri, Dictionary<string, string> payload)
     {
-        if (!UseJsonRequestFormat)
-            return new HttpRequestMessage(GetRequestMethod(), requestUri);
-
-        return new HttpRequestMessage(HttpMethod.Post, new Uri(ProviderConfig.JsonSmscApiAddress.ToString()))
+        if (UseJsonRequestFormat)
         {
-#if NET_CORE_APP
-            Content = JsonContent.Create(@params)
-#else
-            Content = new StringContent(JsonConvert.SerializeObject(@params))
-#endif
-        };
+            if (!SupportsJsonRequestFormat)
+                throw new NotSupportedException("JSON request format is only supported for send.php (https://smsc.ru/rest/send/).");
+
+            return new HttpRequestMessage(HttpMethod.Post, ProviderConfig.JsonSmscApiAddress)
+            {
+                Content = JsonContent.Create(payload)
+            };
+        }
+
+        var method = GetRequestMethod(requestUri, payload);
+        if (method == HttpMethod.Post && ShouldPostParametersInBody(payload))
+        {
+            var baseUri = new Uri(ProviderConfig.SmscApiAddress.ToString() + SiteAddressCommand);
+            return new HttpRequestMessage(HttpMethod.Post, baseUri)
+            {
+                Content = new FormUrlEncodedContent(payload)
+            };
+        }
+
+        return new HttpRequestMessage(method, requestUri);
     }
-    /// <summary>
-    /// При использовании одного из параметров (отправка email или прикрепление файла к сообщению)
-    /// запрос должен отправляться методом POST
-    /// </summary>
-    /// <returns>
-    /// <see langword="true"/> - необходимо использовать метод POST<br/>
-    /// <see langword="false"/> - необходимо использовать метод GET
-    /// </returns>
-    /// <exception cref="ArgumentNullException"/>
-    protected virtual HttpMethod GetRequestMethod() => HttpMethod.Get;
 
     /// <summary>
-    /// Отправка запроса
+    /// Поддерживает ли текущий endpoint JSON REST (<c>rest/send/</c>).
     /// </summary>
-    /// <param name="message">Подготовленный запрос</param>
-    /// <param name="cancellationToken">Токен прерывания</param>
-    /// <returns>Результат выполнения запроса в формате <see cref="HttpResponseMessage"/></returns>
+    protected virtual bool SupportsJsonRequestFormat => false;
+
+    /// <summary>
+    /// Нужно ли отправлять параметры в теле POST (без multipart-файлов).
+    /// </summary>
+    protected virtual bool ShouldPostParametersInBody(Dictionary<string, string> payload) => false;
+
+    /// <summary>
+    /// Выбор HTTP-метода
+    /// </summary>
+    protected virtual HttpMethod GetRequestMethod(Uri requestUri, Dictionary<string, string> payload)
+        => requestUri.OriginalString.Length > MaxQueryStringLength ? HttpMethod.Post : HttpMethod.Get;
+
+    /// <summary>
+    /// Отправка запроса с failover на www1..www5.smsc.ru при пустом ответе
+    /// </summary>
     protected virtual async Task<HttpResponseMessage> SendRequest(HttpRequestMessage message, CancellationToken cancellationToken = default)
-        => await _httpClient.SendAsync(message, cancellationToken);
+    {
+        var baseUri = message.RequestUri ?? throw new InvalidOperationException("Request URI is required.");
+        var method = message.Method;
+        byte[]? bodyBytes = null;
+        string? contentType = null;
+
+        if (message.Content is not null)
+        {
+            bodyBytes = await message.Content.ReadAsByteArrayAsync(
+#if NET5_0_OR_GREATER
+                cancellationToken
+#endif
+            );
+            contentType = message.Content.Headers.ContentType?.ToString();
+        }
+
+        message.Dispose();
+
+        HttpResponseMessage? lastResponse = null;
+        for (var attempt = 0; attempt <= MaxFailoverAttempts; attempt++)
+        {
+            var uri = attempt == 0 ? baseUri : WithFailoverHost(baseUri, attempt);
+            using var request = new HttpRequestMessage(method, uri);
+            if (bodyBytes is not null)
+            {
+                request.Content = new ByteArrayContent(bodyBytes);
+                if (!string.IsNullOrEmpty(contentType))
+                    request.Content.Headers.TryAddWithoutValidation("Content-Type", contentType);
+            }
+
+            lastResponse?.Dispose();
+            lastResponse = await _httpClient.SendAsync(request, cancellationToken);
+            var content = await lastResponse.Content.ReadAsStringAsync(
+#if NET5_0_OR_GREATER
+                cancellationToken
+#endif
+            );
+
+            if (!string.IsNullOrEmpty(content))
+            {
+                var mediaType = lastResponse.Content.Headers.ContentType?.MediaType ?? "text/plain";
+                lastResponse.Content = new StringContent(content, Encoding.UTF8, mediaType);
+                return lastResponse;
+            }
+        }
+
+        throw new InvalidOperationException("Empty response from SMSC after host failover.");
+    }
+
+    private static Uri WithFailoverHost(Uri uri, int attempt)
+    {
+        var builder = new UriBuilder(uri)
+        {
+            Host = $"www{attempt}.smsc.ru"
+        };
+        return builder.Uri;
+    }
 
     /// <summary>
     /// Проверка корректности конфигурации
     /// </summary>
-    protected virtual void CheckSmsConfiguration()
-#if NET_CORE_APP_8
-        => ArgumentNullException.ThrowIfNull(SmsConfiguration, nameof(SmsConfiguration));
-#else
-    {
-        if (SmsConfiguration is null)
-            throw new ArgumentNullException(nameof(SmsConfiguration));
-    }
-#endif
+    protected virtual void CheckSmsConfiguration() => ThrowHelper.ThrowIfNull(SmsConfiguration, nameof(SmsConfiguration));
+
     /// <summary>
     /// Добавление признака формата возвращаемого сообщения
     /// </summary>
-    /// <param name="params">Массив с параметрами соощения</param>
     protected void AddResponseFormat(Dictionary<string, string> @params)
     {
         if (SmsConfiguration!.ResponseFormat != ResponseFormat.Default)
@@ -185,9 +218,9 @@ public abstract class HttpAbstract(
             }
         }
     }
+
     /// <summary>
     /// Настройка кодировки
-    /// <paramref name="params">Список параметров сообщения</paramref>
     /// </summary>
     protected void AddCharset(Dictionary<string, string> @params)
     {
@@ -197,5 +230,14 @@ public abstract class HttpAbstract(
             case Charset.UTF8: @params.Add("charset", "utf-8"); break;
             case Charset.KOI8R: @params.Add("charset", "koi8-r"); break;
         }
+    }
+
+    /// <summary>
+    /// Проверка максимальной длины сообщения (1000 символов по документации SMSC)
+    /// </summary>
+    protected static void EnsureMessageLength(string? message)
+    {
+        if (message is not null && message.Length > MaxMessageLength)
+            throw new MessageMaxLengthException(MaxMessageLength);
     }
 }

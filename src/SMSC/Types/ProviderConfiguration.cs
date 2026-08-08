@@ -33,12 +33,14 @@ public class ProviderConfiguration
     public string? ApiKey { get; }
 
     /// <summary>
-    /// Логин для доступа email серверу SMSC.ru
+    /// Логин для доступа к email-серверу SMSC.ru (SMTP). Не используется HTTP-клиентом; зарезервировано для будущей SMTP-отправки.
     /// </summary>
+    [Obsolete("SMTP credentials are not used by the HTTP client. Reserved for a future SMTP sender.")]
     public string? SmtpLogin { get; set; }
     /// <summary>
-    /// Пароль для доступа к email серверу SMSC.ru
+    /// Пароль для доступа к email-серверу SMSC.ru (SMTP). Не используется HTTP-клиентом; зарезервировано для будущей SMTP-отправки.
     /// </summary>
+    [Obsolete("SMTP credentials are not used by the HTTP client. Reserved for a future SMTP sender.")]
     public string? SmtpPassword { get; set; }
 
     /// <summary>

@@ -1,8 +1,5 @@
 ﻿namespace SMSC.Types;
 
-/// <summary>
-/// Структура конфигурации для отправки СМС сообщений
-/// </summary>
 public class SmsConfiguration : IConfiguration
 {
     private int? _smsRequire;
@@ -32,8 +29,8 @@ public class SmsConfiguration : IConfiguration
     /// Автоматически сокращать ссылки в сообщениях. 
     /// Позволяет заменять ссылки в тексте сообщения на короткие для сокращения длины, 
     /// а также для отслеживания количества переходов на <seealso href="https://smsc.ru/tinyurls/">этой странице</seealso>.<br/>
-    /// <see langword="true"/> - оставить ссылки в тексте сообщения без изменений<br/>
-    /// <see langword="false"/> - сократить ссылки
+    /// <see langword="false"/> - (по умолчанию) оставить ссылки в тексте сообщения без изменений<br/>
+    /// <see langword="true"/> - сократить ссылки (<c>tinyurl=1</c>)
     /// </summary>
     public bool TinyUrl { get; set; }
 
@@ -68,15 +65,8 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
-#if NET_CORE_APP_8
-                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(6));
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, TimeSpan.FromHours(720));
-#else
-                if (value.Value < TimeSpan.FromMinutes(6))
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-                if (value.Value > TimeSpan.FromHours(720))
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-#endif
+                ThrowHelper.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(6));
+                ThrowHelper.ThrowIfGreaterThan(value.Value, TimeSpan.FromHours(720));
             }
 
             _period = value;
@@ -95,15 +85,8 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
-#if NET_CORE_APP_8
-                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(1));
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, TimeSpan.FromMinutes(1440));
-#else
-                if (value.Value < TimeSpan.FromMinutes(1))
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-                if (value.Value > TimeSpan.FromHours(1440))
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-#endif
+                ThrowHelper.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(1));
+                ThrowHelper.ThrowIfGreaterThan(value.Value, TimeSpan.FromMinutes(1440));
             }
 
             _frequency = value;
@@ -136,15 +119,8 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
-#if NET_CORE_APP_8
-                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, 10);
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, 999);
-#else
-                if (value.Value < 10)
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-                if (value.Value > 999)
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-#endif
+                ThrowHelper.ThrowIfLessThan(value.Value, 10);
+                ThrowHelper.ThrowIfGreaterThan(value.Value, 999);
             }
 
             _smsRequire = value;
@@ -155,11 +131,14 @@ public class SmsConfiguration : IConfiguration
     /// </summary>
     public string? FileUrl { get; set; }
     /// <summary>
-    /// Имя бота (telegram), в который необходимо отправить сообщение в формате "@botname_bot".
+    /// Имя бота для отправки сообщения.
+    /// Для Telegram — формат <c>@botname_bot</c> (совместно с <see cref="SmsType.Telegram"/> / <c>tg=1</c>).
+    /// Для WhatsApp — формат <c>wa:botnumber</c> (обязателен при <see cref="SmsType.WhatsApp"/>).
+    /// Кнопки WhatsApp передаются в тексте сообщения: <c>{button,type:param,text}</c>.
     /// </summary>
     public string? BotName { get; set; }
     /// <summary>
-    /// Список параметров для голосового сообщения. Используется только при <see cref="SmsType"/> = <see cref="SmsType.Call"/>
+    /// Список параметров для голосового сообщения. Используется только при <see cref="UseCall"/> = <see langword="true"/>
     /// </summary>
     public CallConfiguration CallConfiguration { get; set; } = new CallConfiguration();
 
@@ -198,15 +177,8 @@ public class SmsConfiguration : IConfiguration
         {
             if (value is not null)
             {
-#if NET_CORE_APP_8
-                ArgumentOutOfRangeException.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(1));
-                ArgumentOutOfRangeException.ThrowIfGreaterThan(value.Value, TimeSpan.FromDays(1));
-#else
-                if (value.Value < TimeSpan.FromMinutes(1))
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-                if (value.Value > TimeSpan.FromDays(1))
-                    throw new ArgumentOutOfRangeException(nameof(value.Value));
-#endif
+                ThrowHelper.ThrowIfLessThan(value.Value, TimeSpan.FromMinutes(1));
+                ThrowHelper.ThrowIfGreaterThan(value.Value, TimeSpan.FromDays(1));
             }
 
             _valid = value;
@@ -258,9 +230,5 @@ public class SmsConfiguration : IConfiguration
     /// <summary>
     /// Список файлов для добавления к запросу.
     /// </summary>
-#if NET_FRAMEWORK
-    public string? Files { get; set; }
-#else
     public MultipartFormDataContent? Files { get; set; }
-#endif
 }

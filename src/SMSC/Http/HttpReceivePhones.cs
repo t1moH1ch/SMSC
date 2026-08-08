@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Выделенные номера для приёма сообщений (<seealso href="https://smsc.ru/api/http/miscellaneous/receive/">receive_phones.php</seealso>).
 /// </summary>
 public class HttpReceivePhones(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private ReceivePhonesConfiguration? _config => SmsConfiguration as ReceivePhonesConfiguration;
 

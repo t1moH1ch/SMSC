@@ -1,7 +1,8 @@
 ﻿namespace SMSC.Http;
 
 public class HttpSmsStatus(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private SmsStatusConfiguration? _smsConfiguration => SmsConfiguration as SmsStatusConfiguration;
 

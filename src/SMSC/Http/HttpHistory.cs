@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Получение истории сообщений и статистики (<seealso href="https://smsc.ru/api/http/get_data/">get.php</seealso>).
 /// </summary>
 public class HttpHistory(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private HistoryConfiguration? _config => SmsConfiguration as HistoryConfiguration;
 

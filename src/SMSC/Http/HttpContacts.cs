@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Управление контактами и группами (<seealso href="https://smsc.ru/api/http/contact/">phones.php</seealso>).
 /// </summary>
 public class HttpContacts(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private ContactsConfiguration? _config => SmsConfiguration as ContactsConfiguration;
 

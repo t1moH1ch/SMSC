@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Управление именами отправителей (<seealso href="https://smsc.ru/api/http/senders/">senders.php</seealso>).
 /// </summary>
 public class HttpSenders(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private SendersConfiguration? _config => SmsConfiguration as SendersConfiguration;
 

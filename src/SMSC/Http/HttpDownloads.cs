@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Действия с отложенными задачами выгрузки (<seealso href="https://smsc.ru/api/http/miscellaneous/downloads/">downloads.php</seealso>).
 /// </summary>
 public class HttpDownloads(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private DownloadsConfiguration? _config => SmsConfiguration as DownloadsConfiguration;
 

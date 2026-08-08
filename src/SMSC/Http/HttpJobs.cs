@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Управление рассылками (<seealso href="https://smsc.ru/api/http/jobs/">jobs.php</seealso>).
 /// </summary>
 public class HttpJobs(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private JobsConfiguration? _config => SmsConfiguration as JobsConfiguration;
 

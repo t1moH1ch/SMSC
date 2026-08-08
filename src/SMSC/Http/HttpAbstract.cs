@@ -1,14 +1,15 @@
 ﻿namespace SMSC.Http;
 
 public abstract class HttpAbstract(
-    ProviderConfiguration configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null)
 {
     protected const int MaxMessageLength = 1000;
     protected const int MaxQueryStringLength = 2000;
     private const int MaxFailoverAttempts = 5;
 
     protected ProviderConfiguration ProviderConfig = configuration ?? throw new ArgumentNullException(nameof(configuration));
-    protected readonly HttpClient _httpClient = new();
+    protected readonly HttpClient _httpClient = httpClient ?? new HttpClient();
 
     /// <summary>
     /// Для разделения телефонных номеров в списке

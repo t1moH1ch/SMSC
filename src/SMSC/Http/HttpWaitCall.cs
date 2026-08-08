@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Подтверждение номера телефона звонком (<seealso href="https://smsc.ru/api/http/miscellaneous/waitcall/">wait_call.php</seealso>).
 /// </summary>
 public class HttpWaitCall(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     protected override string SiteAddressCommand { get; } = "wait_call.php";
 

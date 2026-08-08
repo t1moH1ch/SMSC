@@ -4,7 +4,8 @@ namespace SMSC.Http;
 /// Управление субклиентами (<seealso href="https://smsc.ru/api/http/users/">users.php</seealso>).
 /// </summary>
 public class HttpUsers(
-    ProviderConfiguration configuration) : HttpAbstract(configuration)
+    ProviderConfiguration configuration,
+    HttpClient? httpClient = null) : HttpAbstract(configuration, httpClient)
 {
     private UsersConfiguration? _config => SmsConfiguration as UsersConfiguration;
 

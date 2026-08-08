@@ -5,7 +5,8 @@
 /// </summary>
 /// <param name="providerConfiguration">настройки подключения к серверу</param>
 public class HttpSmsBalance(
-    ProviderConfiguration providerConfiguration) : HttpAbstract(providerConfiguration)
+    ProviderConfiguration providerConfiguration,
+    HttpClient? httpClient = null) : HttpAbstract(providerConfiguration, httpClient)
 {
     private SmsBalanceConfiguration? _smsConfiguration => SmsConfiguration as SmsBalanceConfiguration;
 

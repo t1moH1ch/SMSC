@@ -73,8 +73,13 @@ jobs:
       - name: Test
         run: dotnet test tests/SMSC.Test/SMSC.Test.csproj -c Release --verbosity normal
 
+  # Как в GravatarBuilt: publish на теге vX.Y.Z или на push в main.
+  # Без тега MinVer даёт alpha (1.x.y-alpha.0.N) — публикуем только такие.
+  # GitHub Release — только для стабильных версий.
   publish:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: >
+      github.event_name == 'push' &&
+      (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     needs: [build, test]
     permissions:
@@ -91,15 +96,34 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Read version
+      - name: Validate version for channel
         id: version
         run: |
           VERSION=$(cat artifacts/version.txt)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Package version: $VERSION"
-          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "Expected stable MAJOR.MINOR.PATCH from tag, got: $VERSION"
-            exit 1
+
+          IS_STABLE=false
+          if echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            IS_STABLE=true
+          fi
+          echo "is_stable=$IS_STABLE" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            if [ "$IS_STABLE" != "true" ]; then
+              echo "Tag push expects stable MAJOR.MINOR.PATCH, got: $VERSION"
+              exit 1
+            fi
+          else
+            # Push в main без тега — только pre-release (alpha)
+            if [ "$IS_STABLE" = "true" ]; then
+              echo "Stable version on branch push is not allowed without a tag: $VERSION"
+              exit 1
+            fi
+            if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-alpha(\.|$)'; then
+              echo "Branch push expects alpha pre-release, got: $VERSION"
+              exit 1
+            fi
           fi
 
       - name: Publish to GitHub Packages
@@ -121,6 +145,7 @@ jobs:
             --skip-duplicate
 
       - name: Create GitHub Release
+        if: steps.version.outputs.is_stable == 'true'
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}

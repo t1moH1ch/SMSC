@@ -17,8 +17,8 @@ or for Visual Studio package manager:
 ```sh
 Install-Package SMSC
 ```
-\
-You need to inititate a new instance of `ProviderConfiguration` with credentials:
+
+You need to initiate a new instance of `ProviderConfiguration` with credentials:
 
 ```csharp
 var providerConfig = new ProviderConfiguration(login, password);
@@ -35,7 +35,7 @@ Create request manager from `HttpSms` class:
 ```csharp
 var httpSmsSender = new HttpSms(providerConfig);
 ```
-\
+
 Next, you need to create a configuration class object of `SmsConfiguration` with properties you need:
 
 ```csharp
@@ -51,6 +51,27 @@ var smsConfig = new SmsConfiguration()
 };
 ```
 
+WhatsApp (bot required in `wa:` format per [docs](https://smsc.ru/api/http/send/whatsapp/)):
+
+```csharp
+var smsConfig = new SmsConfiguration()
+{
+    SmsType = SmsType.WhatsApp,
+    BotName = "wa:79888888888"
+};
+var result = await httpSmsSender.SendSms("+79999999999", "Hello {button,tel:+79999999999,Call}", smsConfig);
+```
+
+Telegram:
+
+```csharp
+var smsConfig = new SmsConfiguration()
+{
+    SmsType = SmsType.Telegram,
+    BotName = "@botname_bot"
+};
+```
+
 after that, we send a message
 
 ```csharp
@@ -59,103 +80,121 @@ var result = await httpSmsSender.SendSms("+79999999999", "123456", smsConfig);
 
 That is all you need to send a message to the client. The result is returned as a class object `HttpSmsResponse`.
 
+Optional JSON REST body (`https://smsc.ru/rest/send/`):
+
+```csharp
+httpSmsSender.UseJsonRequestFormat = true;
+```
+
 #
 ### Get status
 
-To check the SMS or e-mail delivery status, you must initiate `ProviderConfiguration`:
-
 ```csharp
 var providerConfig = new ProviderConfiguration(login, password);
-```
-
-or you can initiate `ProviderConfiguration` with an `apikey` that you created in advance ([access passwords page](https://smsc.ru/passwords/))
-
-```csharp
-var providerConfig = new ProviderConfiguration(apiKey);
-```
-
-Create request manager from `HttpSmsStatus` class:
-
-```csharp
 var httpSmsStatus = new HttpSmsStatus(providerConfig);
-```
-\
-Next, you need to create a configuration class object of `SmsStatusConfiguration` with properties you need:
-
-```csharp
-var smsStatusConfig = new SmsStatusConfiguration()
-{
-    Id = id
-};
-```
-
-if you need to get additional information:
-
-```csharp
 var smsStatusConfig = new SmsStatusConfiguration()
 {
     Id = id,
     StatusType = StatusType.Additional
 };
-```
-
-`id` - the ID sent in response from previous step. And finally we send a request to server:
-
-```csharp
 var statusResult = await httpSmsStatus.CheckSms("+79999999999", smsStatusConfig);
 ```
-The result is returned as a class object `HttpSmsStatusResponse`.
+
+Batch check (comma-separated ids/phones in API):
+
+```csharp
+var statusResult = await httpSmsStatus.CheckSms(
+    phones: ["+79999999999", "+78888888888"],
+    ids: ["123", "456"],
+    config: new SmsStatusConfiguration { Id = null });
+```
+
+Telegram-bot message status:
+
+```csharp
+var statusResult = await httpSmsStatus.CheckSms(
+    client: string.Empty,
+    config: new SmsStatusConfiguration { Id = null, Bot = true });
+```
 
 #
 ### Get balance
 
-To get a balance you need to inititate a new instance of `ProviderConfiguration` with credentials:
-
-```csharp
-var providerConfig = new ProviderConfiguration(login, password);
-```
-
-or you can initiate `ProviderConfiguration` with an `apikey` that you created in advance ([access passwords page](https://smsc.ru/passwords/))
-
-```csharp
-var providerConfig = new ProviderConfiguration(apiKey);
-```
-
-Create request manager from `HttpSmsBalance` class:
-
 ```csharp
 var httpSmsBalance = new HttpSmsBalance(providerConfig);
+var balanceResult = await httpSmsBalance.CheckBalance(new SmsBalanceConfiguration());
 ```
-\
-Next, you need to create a configuration class object of `SmsBalanceConfiguration` with properties you need:
+
+#
+### Wait call (phone confirmation)
 
 ```csharp
-var smsBalanceConfig = new SmsBalanceConfiguration();
+var waitCall = new HttpWaitCall(providerConfig);
+var waitResult = await waitCall.RequestAsync("+79999999999");
+// waitResult.Phone — number to call within 15 minutes
 ```
 
-And finally we send a request to server:
+#
+### Contacts
 
 ```csharp
-var balanceResult = await httpSmsBalance.CheckBalance(smsBalanceConfig);
+var contacts = new HttpContacts(providerConfig);
+await contacts.AddAsync("+79999999999", name: "Contact", groupId: "321");
+await contacts.GetGroupsAsync();
 ```
 
-The result is returned as a class object `HttpSmsBalanceResponse`.
+#
+### Jobs (mailings)
+
+```csharp
+var jobs = new HttpJobs(providerConfig);
+await jobs.AddAsync(new JobsConfiguration
+{
+    Name = "Privet",
+    Phones = "79999999999",
+    Message = "Hello!"
+});
+```
+
+#
+### History / senders / users / receive / downloads
+
+```csharp
+var history = new HttpHistory(providerConfig);
+await history.GetMessagesAsync(new HistoryConfiguration { Start = "01.01.2024", End = "01.02.2024" });
+
+var senders = new HttpSenders(providerConfig);
+await senders.GetAsync();
+
+var users = new HttpUsers(providerConfig);
+await users.GetStatAsync();
+
+var receive = new HttpReceivePhones(providerConfig);
+await receive.GetAsync();
+
+var downloads = new HttpDownloads(providerConfig);
+await downloads.GetListAsync();
+```
 
 ## Documentation
 
 This README aims to give a quick start guide - including enough to get you to quickly start sending SMS. For deeper detail of all properties go to [API Documentation](https://smsc.ru/api/#menu), and many other aspects of [smsc.ru](https://smsc.ru).
 
 ## Implemented features
-- Http sms send manager ([documentation](https://smsc.ru/api/http/send/#menu))
-- Http sms status manager ([documentation](https://smsc.ru/api/http/status_messages/#menu))
+- Http SMS send manager ([documentation](https://smsc.ru/api/http/send/#menu))
+- Http SMS status manager ([documentation](https://smsc.ru/api/http/status_messages/#menu))
 - Http balance manager ([documentation](https://smsc.ru/api/http/balance/#menu))
-
-In the future, we plan to implement:
-- Http mailing manager ([documentation](https://smsc.ru/api/http/jobs/#menu))
-- Http contact manager ([documentation](https://smsc.ru/api/http/contact/#menu))
-- Http client manager ([documentation](https://smsc.ru/api/http/users/#menu))
+- Http wait call manager ([documentation](https://smsc.ru/api/http/miscellaneous/waitcall/#menu))
+- Http contacts manager ([documentation](https://smsc.ru/api/http/contact/#menu))
+- Http mailing (jobs) manager ([documentation](https://smsc.ru/api/http/jobs/#menu))
+- Http history / data manager ([documentation](https://smsc.ru/api/http/get_data/#menu))
 - Http sender names manager ([documentation](https://smsc.ru/api/http/senders/#menu))
-- Http data (history) manager ([documentation](https://smsc.ru/api/http/get_data/#menu)) 
-- Connecting dedicated numbers to receive messages ([documentation](https://smsc.ru/api/http/miscellaneous/receive/#menu))
-- Confirming a phone number with a call ([documentation](https://smsc.ru/api/http/miscellaneous/waitcall/#menu))
-- Actions with deferred tasks ([documentation](https://smsc.ru/api/http/miscellaneous/downloads/#menu))
+- Http clients (users) manager ([documentation](https://smsc.ru/api/http/users/#menu))
+- Dedicated receive numbers ([documentation](https://smsc.ru/api/http/miscellaneous/receive/#menu))
+- Deferred downloads ([documentation](https://smsc.ru/api/http/miscellaneous/downloads/#menu))
+
+Transport notes aligned with SMSC docs:
+- Host failover `www1`…`www5.smsc.ru` on empty responses
+- POST for mail/call, attachments, and long query strings
+- Message max length 1000 characters (`MessageMaxLengthException`)
+- WhatsApp via `bot=wa:…` (not legacy `whatsapp=1`)

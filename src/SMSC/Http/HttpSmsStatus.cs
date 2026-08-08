@@ -1,9 +1,5 @@
 ﻿namespace SMSC.Http;
 
-/// <summary>
-/// Обработка запросов для получения статуса отправленного СМС
-/// </summary>
-/// <param name="configuration"></param>
 public class HttpSmsStatus(
     ProviderConfiguration configuration) : HttpAbstract(configuration)
 {
@@ -17,64 +13,76 @@ public class HttpSmsStatus(
     /// <summary>
     /// Проверка статуса доставки SMS или e-mail
     /// </summary>
-    /// <param name="client">Номер мобильного телефона в международном формате, на который отправляется сообщение. 
-    /// Номер могут передаваться без знака "+". Если номер передан без знака "+", то он может быть исправлен автоматическим 
-    /// форматированием и приведен к правильному международному формату. Таким образом, некоторые ошибки при вводе номеров 
-    /// телефонов могут быть исправлены автоматически. Для отключения автоисправления передайте номер со знаком "+".<br/>
-    /// Для <b>e-mail</b> сообщения передается список e-mail адресов получателей.<br/>
-    /// </param>
-    /// <param name="config">Конфигурация отправляемого сообщения</param>
-    /// <param name="cancellationToken">Токен отмены операции</param>
-    /// <exception cref="MessageMaxLengthException"/>
     public virtual async Task<IEnumerable<HttpSmsStatusResponse>> CheckSms(string client, SmsStatusConfiguration config, CancellationToken cancellationToken = default)
     {
         SmsConfiguration = config;
 
         return await (await SendRequest(CreateRequest((@params) =>
         {
-            if (!string.IsNullOrEmpty(client))
+            if (!config.Bot && !string.IsNullOrEmpty(client))
                 @params.Add("phone", client);
         }), cancellationToken))
             .CreateHttpSmsStatusResponseAsync(config);
     }
 
     /// <summary>
-    /// Настройка строки запроса
+    /// Пакетная проверка статусов по спискам идентификаторов и телефонов (через запятую в API).
     /// </summary>
-    /// <returns>Список параметров в виде словаря (ключ-значение)</returns>
-    /// <exception cref="ArgumentException"/>
+    public virtual async Task<IEnumerable<HttpSmsStatusResponse>> CheckSms(
+        IEnumerable<string> phones,
+        IEnumerable<string> ids,
+        SmsStatusConfiguration config,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(phones);
+        ArgumentNullException.ThrowIfNull(ids);
+
+        var phoneList = phones.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
+        var idList = ids.Where(i => !string.IsNullOrWhiteSpace(i)).ToArray();
+
+        if (idList.Length == 0 && !config.Bot)
+            throw new ArgumentException("At least one message id is required.", nameof(ids));
+
+        config.Id = string.Join(",", idList);
+        SmsConfiguration = config;
+
+        return await (await SendRequest(CreateRequest((@params) =>
+        {
+            if (!config.Bot && phoneList.Length > 0)
+                @params.Add("phone", string.Join(",", phoneList));
+        }), cancellationToken))
+            .CreateHttpSmsStatusResponseAsync(config);
+    }
+
+    /// <inheritdoc/>
     protected override Dictionary<string, string> GetQueryDictionary()
     {
         CheckSmsConfiguration();
 
         var @params = new Dictionary<string, string>();
 
-        if (_smsConfiguration!.Id is not null)
+        if (_smsConfiguration!.Bot)
+        {
+            @params.Add("bot", "1");
+        }
+        else if (_smsConfiguration.Id is not null)
+        {
             @params.Add("id", _smsConfiguration.Id);
+        }
 
         AddResponseFormat(@params);
-
         AddStatusTypeParameter(@params);
         AddCharset(@params);
 
         if (_smsConfiguration!.Delete)
         {
-#if NET_CORE_APP_8
             ArgumentException.ThrowIfNullOrEmpty(_smsConfiguration!.Id);
-#else
-            if (string.IsNullOrEmpty(_smsConfiguration.Id))
-                throw new ArgumentNullException(nameof(_smsConfiguration.Id));
-#endif
             @params.Add("del", "1");
         }
 
         return @params;
     }
-    /// <summary>
-    /// Добавление в список параметров информации о возвращаемом статусе сообщения
-    /// </summary>
-    /// <param name="params">Список параметров сообщения</param>
-    /// <exception cref="ArgumentException"></exception>
+
     private void AddStatusTypeParameter(Dictionary<string, string> @params)
     {
         if (_smsConfiguration!.StatusType != StatusType.Default)
@@ -83,11 +91,7 @@ public class HttpSmsStatus(
             {
                 case StatusType.Full: @params.Add("all", "1"); break;
                 case StatusType.Additional: @params.Add("all", "2"); break;
-#if NET_CORE_APP
                 default: throw new ArgumentException($"Unknown status type - {Enum.GetName(_smsConfiguration.StatusType)}");
-#else
-                default: throw new ArgumentException($"Unknown status type - {Enum.GetName(typeof(StatusType), _smsConfiguration.StatusType)}");
-#endif
             }
         }
     }

@@ -26,10 +26,9 @@ internal class FloatFromStringJsonConverter : JsonConverter<float?>
         }
         if (reader.TokenType == JsonTokenType.Number)
         {
-            var propValue = reader.GetInt32().ToString();
-            if (!float.TryParse(propValue, out var result))
-                return null;
-            return result;
+            if (reader.TryGetDouble(out var number))
+                return (float)number;
+            return null;
         }
         throw new InvalidCastException($"Unsupported token type {Enum.GetName(reader.TokenType)}");
     }

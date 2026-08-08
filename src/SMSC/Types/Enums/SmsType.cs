@@ -57,12 +57,13 @@ public enum SmsType
     /// </summary>
     Socials,
     /// <summary>
-    /// Признак whatsapp-сообщения, отправляемого пользователям мессенджера WhatsApp.
-    /// Сообщение с кодом подтверждения, переданным в параметре Message.
+    /// Признак telegram-сообщения (<c>tg=1</c>).
+    /// Имя бота задаётся через <see cref="SmsConfiguration.BotName"/> в формате <c>@botname_bot</c>.
     /// </summary>
     Telegram,
     /// <summary>
-    /// Признак whatsapp-сообщения, отправляемого пользователям мессенджера WhatsApp.
+    /// Признак whatsapp-сообщения. По актуальной документации SMSC отправка выполняется через
+    /// <see cref="SmsConfiguration.BotName"/> в формате <c>wa:botnumber</c> (параметр <c>bot</c>).
     /// </summary>
     WhatsApp
 }

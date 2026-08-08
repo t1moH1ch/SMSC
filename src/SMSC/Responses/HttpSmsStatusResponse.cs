@@ -165,6 +165,11 @@ public class HttpSmsStatusResponse
 #endif
     public string? Comment { get; set; }
     /// <summary>
+    /// DTMF-код, введённый абонентом при голосовом сообщении (если доступен в ответе).
+    /// </summary>
+    [JsonPropertyName("dtmf")]
+    public string? Dtmf { get; set; }
+    /// <summary>
     /// Числовой код страны абонента плюс числовой код оператора абонента.
     /// </summary>
 #if NET_CORE_APP

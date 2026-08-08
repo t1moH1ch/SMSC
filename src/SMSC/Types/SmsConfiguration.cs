@@ -32,8 +32,8 @@ public class SmsConfiguration : IConfiguration
     /// Автоматически сокращать ссылки в сообщениях. 
     /// Позволяет заменять ссылки в тексте сообщения на короткие для сокращения длины, 
     /// а также для отслеживания количества переходов на <seealso href="https://smsc.ru/tinyurls/">этой странице</seealso>.<br/>
-    /// <see langword="true"/> - оставить ссылки в тексте сообщения без изменений<br/>
-    /// <see langword="false"/> - сократить ссылки
+    /// <see langword="false"/> - (по умолчанию) оставить ссылки в тексте сообщения без изменений<br/>
+    /// <see langword="true"/> - сократить ссылки (<c>tinyurl=1</c>)
     /// </summary>
     public bool TinyUrl { get; set; }
 
@@ -155,7 +155,10 @@ public class SmsConfiguration : IConfiguration
     /// </summary>
     public string? FileUrl { get; set; }
     /// <summary>
-    /// Имя бота (telegram), в который необходимо отправить сообщение в формате "@botname_bot".
+    /// Имя бота для отправки сообщения.
+    /// Для Telegram — формат <c>@botname_bot</c> (совместно с <see cref="SmsType.Telegram"/> / <c>tg=1</c>).
+    /// Для WhatsApp — формат <c>wa:botnumber</c> (обязателен при <see cref="SmsType.WhatsApp"/>).
+    /// Кнопки WhatsApp передаются в тексте сообщения: <c>{button,type:param,text}</c>.
     /// </summary>
     public string? BotName { get; set; }
     /// <summary>

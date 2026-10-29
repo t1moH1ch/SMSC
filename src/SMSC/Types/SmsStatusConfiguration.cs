@@ -35,8 +35,8 @@ public class SmsStatusConfiguration : IConfiguration
     /// </summary>
     public bool Delete { get; set; }
     /// <summary>
-    /// Признак запроса статуса сообщения, отправленного через Telegram-бота (<c>bot=1</c>).
-    /// При <see langword="true"/> параметры phone и id не используются.
+    /// Признак запроса статуса сообщения, отправленного в чат-бот Telegram (<c>bot=1</c>).
+    /// Используется вместе с номером телефона и <see cref="Id"/>.
     /// </summary>
     public bool Bot { get; set; }
 }

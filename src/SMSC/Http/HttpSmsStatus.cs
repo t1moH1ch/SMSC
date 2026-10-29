@@ -18,9 +18,12 @@ public class HttpSmsStatus(
     {
         SmsConfiguration = config;
 
+        if (config.Bot)
+            ThrowHelper.ThrowIfNullOrEmpty(client, nameof(client));
+
         return await (await SendRequest(CreateRequest((@params) =>
         {
-            if (!config.Bot && !string.IsNullOrEmpty(client))
+            if (!string.IsNullOrEmpty(client))
                 @params.Add("phone", client);
         }), cancellationToken))
             .CreateHttpSmsStatusResponseAsync(config);
@@ -41,15 +44,18 @@ public class HttpSmsStatus(
         var phoneList = phones.Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
         var idList = ids.Where(i => !string.IsNullOrWhiteSpace(i)).ToArray();
 
-        if (idList.Length == 0 && !config.Bot)
+        if (idList.Length == 0)
             throw new ArgumentException("At least one message id is required.", nameof(ids));
+
+        if (config.Bot && phoneList.Length == 0)
+            throw new ArgumentException("At least one phone is required together with bot=1.", nameof(phones));
 
         config.Id = string.Join(",", idList);
         SmsConfiguration = config;
 
         return await (await SendRequest(CreateRequest((@params) =>
         {
-            if (!config.Bot && phoneList.Length > 0)
+            if (phoneList.Length > 0)
                 @params.Add("phone", string.Join(",", phoneList));
         }), cancellationToken))
             .CreateHttpSmsStatusResponseAsync(config);
@@ -64,12 +70,12 @@ public class HttpSmsStatus(
 
         if (_smsConfiguration!.Bot)
         {
+            ThrowHelper.ThrowIfNullOrEmpty(_smsConfiguration.Id, nameof(_smsConfiguration.Id));
             @params.Add("bot", "1");
         }
-        else if (_smsConfiguration.Id is not null)
-        {
+
+        if (_smsConfiguration.Id is not null)
             @params.Add("id", _smsConfiguration.Id);
-        }
 
         AddResponseFormat(@params);
         AddStatusTypeParameter(@params);

@@ -6,6 +6,11 @@ namespace SMSC.Responses;
 public class HttpSmsStatusResponse
 {
     /// <summary>
+    /// Идентификатор сообщения. Возвращается при пакетном запросе статусов.
+    /// </summary>
+    [JsonPropertyName("id"), JsonConverter(typeof(NumberToStringJsonConverter))]
+    public string? Id { get; set; }
+    /// <summary>
     /// код статуса (<seealso href="https://smsc.ru/api/http/status_messages/statuses/">список</seealso>)
     /// </summary>
     [JsonPropertyName("status"), JsonConverter(typeof(StringToStatusJsonConverter))]
@@ -21,9 +26,9 @@ public class HttpSmsStatusResponse
     [JsonPropertyName("last_timestamp"), JsonConverter(typeof(StringToDateTimeJsonConverter))]
     public DateTime? LastTimestamp { get; set; }
     /// <summary>
-    /// Флаг в виде 2-х байтового числа, содержащий различную информацию о сообщении. Возможны комбинации значений битов разных характеристик. Биты 0-3 (тип сообщения): 0 – SMS, 1 – Flash-SMS, 2 – Бинарное SMS, 3 – Wap-push, 4 – HLR-запрос, 5 – Ping-SMS, 6 – MMS, 7 – Звонок, 8 – E-mail, 10 – Viber, 12 – Соцсети.<br/>
-    /// Бит 5 – оплата сообщения со второго баланса.Бит 8 – признак шаблонного сообщения.<br/>
-    /// Биты 10,9 – тип шаблонного сообщения(00 - сервисное, 01 - транзакционное, 10 - авторизационное, 11 - рекламное).
+    /// Флаг в виде 2-х байтового числа, содержащий различную информацию о сообщении. Возможны комбинации значений битов разных характеристик. Биты 0-3 (тип сообщения): 0 – SMS, 1 – Flash-SMS, 2 – Бинарное SMS, 3 – Wap-push, 4 – HLR-запрос, 5 – Ping-SMS, 6 – Telegram, 7 – Звонок, 8 – E-mail, 10 – Viber, 12 – Соцсети, 13 – Боты.<br/>
+    /// Бит 5 – оплата сообщения со второго баланса. Бит 8 – признак шаблонного сообщения.<br/>
+    /// Биты 10,9 – тип шаблонного сообщения (00 - сервисное, 01 - транзакционное, 10 - авторизационное, 11 - рекламное). Бит 15 – сообщение из фиксированного пакета.
     /// </summary>
     [JsonPropertyName("flag")]
     public short? Flag { get; set; }
@@ -103,8 +108,8 @@ public class HttpSmsStatusResponse
     [JsonPropertyName("mccmnc")]
     public string? MccMnc { get; set; }
     /// <summary>
-    /// Тип сообщения (0 – SMS, 1 – Flash-SMS, 2 – Бинарное SMS, 3 – Wap-push, 4 – HLR-запрос, 
-    /// 5 – Ping-SMS, 6 – MMS, 7 – Звонок, 8 – E-mail, 10 – Viber, 12 – Соцсети).
+    /// Тип сообщения (0 – SMS, 1 – Flash-SMS, 2 – Бинарное SMS, 3 – Wap-push, 4 – HLR-запрос,
+    /// 5 – Ping-SMS, 6 – Telegram, 7 – Звонок, 8 – E-mail, 10 – Viber, 12 – Соцсети, 13 – Боты).
     /// </summary>
     [JsonPropertyName("type"), JsonConverter(typeof(IntToSmsTypeJsonConverter))]
     public SmsType? MessageType { get; set; }

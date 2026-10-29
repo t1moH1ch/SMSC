@@ -62,7 +62,17 @@ var smsConfig = new SmsConfiguration()
 var result = await httpSmsSender.SendSms("+79999999999", "Hello {button,tel:+79999999999,Call}", smsConfig);
 ```
 
-Telegram:
+Telegram confirmation code (`tg=1`, 4 to 8 digits):
+
+```csharp
+var smsConfig = new SmsConfiguration()
+{
+    SmsType = SmsType.Telegram
+};
+var result = await httpSmsSender.SendSms("+79999999999", "123456", smsConfig);
+```
+
+Telegram chat bot (`bot=@botname_bot`, without `tg=1`):
 
 ```csharp
 var smsConfig = new SmsConfiguration()
@@ -70,12 +80,7 @@ var smsConfig = new SmsConfiguration()
     SmsType = SmsType.Telegram,
     BotName = "@botname_bot"
 };
-```
-
-after that, we send a message
-
-```csharp
-var result = await httpSmsSender.SendSms("+79999999999", "123456", smsConfig);
+var result = await httpSmsSender.SendSms("+79999999999", "Hello", smsConfig);
 ```
 
 That is all you need to send a message to the client. The result is returned as a class object `HttpSmsResponse`.
@@ -109,12 +114,12 @@ var statusResult = await httpSmsStatus.CheckSms(
     config: new SmsStatusConfiguration { Id = null });
 ```
 
-Telegram-bot message status:
+Telegram-bot message status (`bot=1` together with phone and id):
 
 ```csharp
 var statusResult = await httpSmsStatus.CheckSms(
-    client: string.Empty,
-    config: new SmsStatusConfiguration { Id = null, Bot = true });
+    "+79999999999",
+    new SmsStatusConfiguration { Id = id, Bot = true });
 ```
 
 #

@@ -297,7 +297,7 @@ public class HttpSmsTest
             FullErrorPhonesResponse = true,
         };
 
-        var res = await smsSender.SendSms(Phone1, "test", smsConfig);
+        var res = await smsSender.SendSms(Phone1, "123456", smsConfig);
         Assert.NotNull(res);
         Assert.NotNull(res.Phones);
         Assert.NotEmpty(res.Phones);

@@ -24,6 +24,7 @@ public class HttpSms(
 	{
 		ThrowHelper.ThrowIfNullOrEmpty(client, nameof(client));
 		EnsureMessageLength(message);
+		EnsureTelegramSend(config, message);
 
 		SmsConfiguration = config;
 		return await (await SendRequest(CreateRequest((@params) =>
@@ -49,6 +50,7 @@ public class HttpSms(
 			throw new ArgumentOutOfRangeException(nameof(clients), "Clients can`t be empty. Try fill it.");
 
 		EnsureMessageLength(message);
+		EnsureTelegramSend(config, message);
 		SmsConfiguration = config;
 
 		var phones = string.Join(PhonesDelimeter, clients.Where(c => !string.IsNullOrEmpty(c)).Select(c => c!.ToString()));
@@ -74,7 +76,10 @@ public class HttpSms(
 			throw new ArgumentOutOfRangeException(nameof(sendItems), "Send items can`t be empty. Try fill it.");
 
 		foreach (var item in sendItems)
+		{
 			EnsureMessageLength(item.Message);
+			EnsureTelegramSend(config, item.Message);
+		}
 
 		SmsConfiguration = config;
 
@@ -100,7 +105,10 @@ public class HttpSms(
 			throw new ArgumentOutOfRangeException(nameof(sendItems), "Send items can`t be empty. Try fill it.");
 
 		foreach (var item in sendItems)
+		{
 			EnsureMessageLength(item.Message);
+			EnsureTelegramSend(config, item.Message);
+		}
 
 		SmsConfiguration = config;
 
@@ -123,6 +131,7 @@ public class HttpSms(
 	{
 		ThrowHelper.ThrowIfNullOrEmpty(groupId, nameof(groupId));
 		EnsureMessageLength(message);
+		EnsureTelegramSend(config, message);
 
 		if (groupId.Contains(",") || groupId.Contains(";"))
 			throw new InvalidOperationException($"{nameof(groupId)} can`t contains , or ;");
@@ -305,6 +314,43 @@ public class HttpSms(
 		return base.CreateRequestMessage(requestUri, payload);
 	}
 
+	private static readonly Regex TelegramConfirmationCode = new(@"^\d{4,8}$", RegexOptions.CultureInvariant);
+
+	/// <summary>
+	/// <c>tg=1</c> принимает только числовой код длиной от 4 до 8 цифр.
+	/// Сообщение в чат-бот уходит параметром <c>bot</c> и этот код не требует.
+	/// </summary>
+	internal static void EnsureTelegramSend(SmsType smsType, string? botName, string? message)
+	{
+		if (smsType == SmsType.Telegram)
+		{
+			if (botName is { Length: > 0 } telegramBot)
+			{
+				if (!telegramBot.StartsWith("@", StringComparison.Ordinal))
+					throw new ArgumentException("Telegram BotName must be in format @botname_bot.", nameof(botName));
+				return;
+			}
+
+			if (message is null || !TelegramConfirmationCode.IsMatch(message))
+				throw new ArgumentException(
+					"Telegram confirmation code must be 4 to 8 digits (tg=1). Set BotName (@botname_bot) to send a chat-bot message.",
+					nameof(message));
+			return;
+		}
+
+		if (smsType != SmsType.Bots)
+			return;
+
+		var namedBot = botName ?? string.Empty;
+		if (namedBot.Length == 0
+			|| (!namedBot.StartsWith("@", StringComparison.Ordinal)
+				&& !namedBot.StartsWith("wa:", StringComparison.OrdinalIgnoreCase)))
+			throw new ArgumentException("BotName must be @botname_bot or wa:botnumber.", nameof(botName));
+	}
+
+	private static void EnsureTelegramSend(SmsConfiguration config, string? message)
+		=> EnsureTelegramSend(config.SmsType, config.BotName, message);
+
 	private static void AddNewLineParameter(Dictionary<string, string> @params)
 		=> @params.Add("nl", "1");
 
@@ -346,7 +392,20 @@ public class HttpSms(
 				if (!_smsConfiguration.BotName.StartsWith("wa:", StringComparison.OrdinalIgnoreCase))
 					throw new ArgumentException("WhatsApp BotName must be in format wa:botnumber.", nameof(_smsConfiguration.BotName));
 				return;
-			case SmsType.Telegram: key = "tg"; val = "1"; break;
+			case SmsType.Telegram:
+				if (_smsConfiguration.BotName is { Length: > 0 } telegramBot)
+				{
+					if (!telegramBot.StartsWith("@", StringComparison.Ordinal))
+						throw new ArgumentException("Telegram BotName must be in format @botname_bot.", nameof(_smsConfiguration.BotName));
+					return;
+				}
+				key = "tg"; val = "1"; break;
+			case SmsType.Bots:
+				ThrowHelper.ThrowIfNullOrEmpty(_smsConfiguration.BotName, nameof(_smsConfiguration.BotName));
+				if (!_smsConfiguration.BotName.StartsWith("@", StringComparison.Ordinal)
+					&& !_smsConfiguration.BotName.StartsWith("wa:", StringComparison.OrdinalIgnoreCase))
+					throw new ArgumentException("BotName must be @botname_bot or wa:botnumber.", nameof(_smsConfiguration.BotName));
+				return;
 			case SmsType.Call: key = "call"; val = "1"; break;
 			default: throw new NotImplementedException($"Type {_smsConfiguration.SmsType} is unknown.");
 		}

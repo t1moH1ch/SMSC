@@ -22,31 +22,44 @@ internal class IntToSmsTypeJsonConverter : JsonConverter<SmsType?>
             3 => SmsType.WapPush,
             4 => SmsType.HLR,
             5 => SmsType.Ping,
-            6 => SmsType.MMS,
+            6 => SmsType.Telegram,
             7 => SmsType.Call,
             8 => SmsType.Mail,
             10 => SmsType.Viber,
             12 => SmsType.Socials,
+            13 => SmsType.Bots,
             _ => throw new InvalidOperationException($"Unknown type of {nameof(SmsType)}. Get code - {type}.")
         };
     }
 
     public override void Write(Utf8JsonWriter writer, SmsType? value, JsonSerializerOptions options)
     {
-        switch (value)
+        if (value is null)
         {
-            default:
-            case SmsType.Default: writer.WriteNumberValue(0); break;
-            case SmsType.Flash: writer.WriteNumberValue(1); break;
-            case SmsType.Bin: writer.WriteNumberValue(2); break;
-            case SmsType.WapPush: writer.WriteNumberValue(3); break;
-            case SmsType.HLR: writer.WriteNumberValue(4); break;
-            case SmsType.Ping: writer.WriteNumberValue(5); break;
-            case SmsType.MMS: writer.WriteNumberValue(6); break;
-            case SmsType.Call: writer.WriteNumberValue(7); break;
-            case SmsType.Mail: writer.WriteNumberValue(8); break;
-            case SmsType.Viber: writer.WriteNumberValue(9); break;
-            case SmsType.Socials: writer.WriteNumberValue(10); break;
+            writer.WriteNullValue();
+            return;
         }
+
+        // https://smsc.ru/api/http/status_messages/ — поле type.
+        // MMS отправляется как mms=1 и отдельного кода в статусе больше нет.
+        var code = value.Value switch
+        {
+            SmsType.Default => 0,
+            SmsType.Flash => 1,
+            SmsType.Bin => 2,
+            SmsType.WapPush => 3,
+            SmsType.HLR => 4,
+            SmsType.Ping => 5,
+            SmsType.Telegram => 6,
+            SmsType.Call => 7,
+            SmsType.Mail => 8,
+            SmsType.Viber => 10,
+            SmsType.Socials => 12,
+            SmsType.WhatsApp or SmsType.Bots => 13,
+            SmsType.MMS => throw new InvalidOperationException("SMSC status API does not assign a type code to MMS."),
+            _ => throw new InvalidOperationException($"Unknown type of {nameof(SmsType)}.")
+        };
+
+        writer.WriteNumberValue(code);
     }
 }

@@ -32,7 +32,10 @@ public class HttpJobs(
     public virtual async Task<IEnumerable<HttpJobsResponse>> ExecuteAsync(JobsConfiguration config, CancellationToken cancellationToken = default)
     {
         if (config.Operation == JobsOperation.Add)
+        {
             EnsureMessageLength(config.Message);
+            HttpSms.EnsureTelegramSend(config.SmsType, config.BotName, config.Message);
+        }
 
         SmsConfiguration = config;
         return await (await SendRequest(CreateRequest(), cancellationToken))
@@ -74,15 +77,15 @@ public class HttpJobs(
         if (c.RepeatCount is not null) @params["rptn"] = c.RepeatCount.Value.ToString();
         if (c.FallbackToSms) @params["fl[5]"] = "1";
 
-        AddSmsTypeFlag(@params, c.SmsType);
+        AddSmsTypeFlag(@params, c);
         AddResponseFormat(@params);
         AddCharset(@params);
         return @params;
     }
 
-    private static void AddSmsTypeFlag(Dictionary<string, string> @params, SmsType type)
+    private static void AddSmsTypeFlag(Dictionary<string, string> @params, JobsConfiguration config)
     {
-        switch (type)
+        switch (config.SmsType)
         {
             case SmsType.Default: return;
             case SmsType.Flash: @params["flash"] = "1"; break;
@@ -94,8 +97,13 @@ public class HttpJobs(
             case SmsType.Call: @params["call"] = "1"; break;
             case SmsType.Viber: @params["viber"] = "1"; break;
             case SmsType.Socials: @params["soc"] = "1"; break;
-            case SmsType.Telegram: @params["tg"] = "1"; break;
-            case SmsType.WhatsApp: break;
+            case SmsType.Telegram:
+                if (string.IsNullOrEmpty(config.BotName))
+                    @params["tg"] = "1";
+                break;
+            case SmsType.WhatsApp:
+            case SmsType.Bots:
+                break;
             case SmsType.Bin: @params["bin"] = "1"; break;
         }
     }

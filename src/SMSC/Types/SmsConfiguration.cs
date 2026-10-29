@@ -131,9 +131,10 @@ public class SmsConfiguration : IConfiguration
     /// </summary>
     public string? FileUrl { get; set; }
     /// <summary>
-    /// Имя бота для отправки сообщения.
-    /// Для Telegram — формат <c>@botname_bot</c> (совместно с <see cref="SmsType.Telegram"/> / <c>tg=1</c>).
-    /// Для WhatsApp — формат <c>wa:botnumber</c> (обязателен при <see cref="SmsType.WhatsApp"/>).
+    /// Имя бота для отправки сообщения (параметр <c>bot</c>, без <c>tg=1</c>).
+    /// Для Telegram — формат <c>@botname_bot</c>. Для WhatsApp — формат <c>wa:botnumber</c>
+    /// (обязателен при <see cref="SmsType.WhatsApp"/>).
+    /// Код подтверждения Telegram отправляется отдельно: <see cref="SmsType.Telegram"/> без этого свойства (<c>tg=1</c>, 4–8 цифр).
     /// Кнопки WhatsApp передаются в тексте сообщения: <c>{button,type:param,text}</c>.
     /// </summary>
     public string? BotName { get; set; }
@@ -213,8 +214,8 @@ public class SmsConfiguration : IConfiguration
     /// <summary>
     /// Признак необходимости добавления в ответ сервера информации по каждому номеру.<br/>
     /// <see langword="false"/> - (по умолчанию) – не добавлять список (обычный ответ сервера).<br/>
-    /// <see langword="true"/> - в ответ добавляется список всех номеров телефонов с соответствующими статусами, значениями mcc и mnc, 
-    /// стоимостью, и, в случае ошибочных номеров, кодами ошибок.
+    /// <see langword="true"/> - в ответ добавляется список всех номеров с <c>mccmnc</c> и стоимостью.
+    /// При ошибке отправки для номера также возвращаются статус и код ошибки.
     /// </summary>
     public bool FullErrorPhonesResponse { get; set; }
 

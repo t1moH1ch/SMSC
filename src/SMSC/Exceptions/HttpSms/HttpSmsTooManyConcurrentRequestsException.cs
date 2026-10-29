@@ -15,5 +15,5 @@ public class HttpSmsTooManyConcurrentRequestsException : SmsExceptionAbstract
     /// Данная ошибка возникает также при попытке отправки пятнадцати и более запросов одновременно с разных 
     /// подключений под одним логином.
     /// </summary>
-    public override string Message => "Sending more than one identical SMS message request or more than five identical SMS cost requests within a minute.";
+    public override string Message => "Sending more than one identical SMS message request or more than five identical SMS cost requests within a minute, or fifteen or more concurrent requests under one login.";
 }
